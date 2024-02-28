@@ -18,25 +18,41 @@ import { useEffect, useState } from 'react';
 import PlayerForm from './components/playerForm';
 import PlayerRow from './components/playerRow';
 
-const data: Player[] = [
-    {
-        playerID: 1,
-        firstName: 'LeBron',
-        lastName: 'James',
-    },
-    { playerID: 2, firstName: 'Kevin', lastName: 'Durant' },
-];
-
 export default function Players() {
     const [opened, { open, close }] = useDisclosure(false);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(
         undefined
     );
+    const [players, setPlayers] = useState<Player[]>([]);
+
+    async function getData() {
+        try {
+            let resp = await fetch('/api/players', {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await resp.json();
+
+            console.log('Recieved from API : ', data);
+
+            setPlayers(data);
+        } catch (e) {
+            throw new Error('Error occured while calling Location API');
+        }
+    }
 
     function closeModal() {
         setCurrentPlayer(undefined);
         close();
     }
+
+    useEffect(() => {
+        getData();
+    }, []);
 
     useEffect(() => {
         if (currentPlayer) {
@@ -68,7 +84,7 @@ export default function Players() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data.map((d) => (
+                    {players.map((d) => (
                         <PlayerRow
                             key={d.playerID}
                             player={d}

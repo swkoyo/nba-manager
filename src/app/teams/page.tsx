@@ -18,41 +18,46 @@ import { useEffect, useState } from 'react';
 import TeamForm from './components/teamForm';
 import TeamRow from './components/teamRow';
 
-const data: Team[] = [
-    {
-        teamID: 1,
-        city: 'Miami',
-        name: 'Heat',
-        state: 'FL',
-    },
-    {
-        teamID: 2,
-        city: 'Phoenix',
-        name: 'Suns',
-        state: 'AZ',
-    },
-    {
-        teamID: 3,
-        city: 'Los Angeles',
-        name: 'Lakers',
-        state: 'CA',
-    },
-];
-
 export default function Teams() {
     const [opened, { open, close }] = useDisclosure(false);
     const [currentTeam, setCurrentTeam] = useState<Team | undefined>(undefined);
+    const [teams, setTeams] = useState<Team[]>([]);
 
     function closeModal() {
         setCurrentTeam(undefined);
         close();
     }
 
+    async function getData() {
+        try {
+            let resp = await fetch('/api/teams', {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await resp.json();
+
+            console.log('Recieved from API : ', data);
+
+            setTeams(data);
+        } catch (e) {
+            throw new Error('Error occured while calling Location API');
+        }
+    }
+
+    useEffect(() => {
+        getData();
+    });
+
     useEffect(() => {
         if (currentTeam) {
             open();
         }
     }, [currentTeam, open]);
+
     return (
         <>
             <Modal
@@ -78,7 +83,7 @@ export default function Teams() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data.map((d) => (
+                    {teams.map((d) => (
                         <TeamRow
                             key={d.teamID}
                             team={d}

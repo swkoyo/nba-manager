@@ -1,13 +1,14 @@
 import { turso } from '@/lib/db/turso';
 import { findPlayerByID } from './helpers';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
     try {
         const { rows } = await turso.execute('SELECT * FROM Players');
-        return Response.json(rows);
+        return NextResponse.json(rows);
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -25,10 +26,10 @@ export async function POST(request: Request) {
             sql: 'SELECT * FROM Players WHERE firstName=? AND lastName=? ORDER BY playerID DESC LIMIT 1',
             args: [firstName, lastName],
         });
-        return Response.json(rows[0], { status: 201 });
+        return NextResponse.json(rows[0], { status: 201 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -47,10 +48,10 @@ export async function PUT(request: Request) {
             args: [firstName, lastName, playerID],
         });
         player = await findPlayerByID(playerID);
-        return Response.json(player, { status: 200 });
+        return NextResponse.json(player, { status: 200 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -68,10 +69,10 @@ export async function DELETE(request: Request) {
             sql: 'DELETE FROM Players WHERE playerID=?',
             args: [playerID],
         });
-        return Response.json({ message: 'Success' }, { status: 200 });
+        return NextResponse.json({ message: 'Success' }, { status: 200 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );

@@ -1,13 +1,14 @@
 import { turso } from '@/lib/db/turso';
 import { findTeamByID, isExistingTeam } from './helpers';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
     try {
         const { rows } = await turso.execute('SELECT * FROM Teams');
-        return Response.json(rows);
+        return NextResponse.json(rows);
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -29,10 +30,10 @@ export async function POST(request: Request) {
             sql: 'SELECT * FROM Teams WHERE name=?',
             args: [name],
         });
-        return Response.json(rows[0], { status: 201 });
+        return NextResponse.json(rows[0], { status: 201 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -55,10 +56,10 @@ export async function PUT(request: Request) {
             args: [name, city, state, teamID],
         });
         team = await findTeamByID(teamID);
-        return Response.json(team, { status: 200 });
+        return NextResponse.json(team, { status: 200 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
@@ -76,10 +77,10 @@ export async function DELETE(request: Request) {
             sql: 'DELETE FROM Teams WHERE teamID=?',
             args: [teamID],
         });
-        return Response.json({ message: 'Success' }, { status: 200 });
+        return NextResponse.json({ message: 'Success' }, { status: 200 });
     } catch (err) {
         console.error(err);
-        return Response.json(
+        return NextResponse.json(
             { message: (err as Error).message },
             { status: 400 }
         );
