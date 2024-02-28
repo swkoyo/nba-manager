@@ -1,4 +1,4 @@
-import { turso } from '@/lib/turso';
+import { turso } from '@/lib/db/turso';
 import { findPlayoffRoundByID, isExistingPlayoffRound } from './helpers';
 
 export async function GET() {

@@ -1,4 +1,4 @@
-import { turso } from '@/lib/turso';
+import { turso } from '@/lib/db/turso';
 import { Player } from '@/lib/types';
 
 export async function findPlayerByID(playerID: number): Promise<Player | null> {
