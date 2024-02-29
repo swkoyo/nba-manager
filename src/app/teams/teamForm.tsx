@@ -6,7 +6,7 @@ import { Box, Button, Group, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { z } from 'zod';
 import { zodResolver } from '@mantine/form';
-import { redirect } from '../actions';
+import { redirect, revalidateTag } from '../actions';
 import Link from 'next/link';
 import { useSWRConfig } from 'swr';
 
@@ -66,6 +66,7 @@ export default function TeamForm({ team }: Props) {
                 mutate('/api/teams');
                 mutate('/api/rosters');
             }
+            revalidateTag('available');
             redirect('/teams');
         } catch (err) {
             console.error(err);

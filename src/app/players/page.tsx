@@ -1,30 +1,8 @@
-import { Player } from '@/lib/types';
-import {
-    Button,
-    Center,
-    Space,
-    Table,
-    TableTbody,
-    TableTh,
-    TableThead,
-    TableTr,
-    Title,
-} from '@mantine/core';
-import PlayerRow from './playerRow';
+import { Button, Center, Space, Title } from '@mantine/core';
 import Link from 'next/link';
+import PlayerDataView from './playerDataView';
 
-async function getData(): Promise<Player[]> {
-    const res = await fetch('http://localhost:3000/api/players', {
-        next: { tags: ['players'] },
-    });
-    if (!res.ok) {
-        throw new Error('Failed to fetch data');
-    }
-    return res.json();
-}
-
-export default async function Players() {
-    const data = await getData();
+export default function Players() {
     return (
         <>
             <Center>
@@ -35,21 +13,7 @@ export default async function Players() {
                 Add New Players
             </Button>
             <Space h='md' />
-            <Table>
-                <TableThead>
-                    <TableTr>
-                        <TableTh>ID</TableTh>
-                        <TableTh>First Name</TableTh>
-                        <TableTh>Last Name</TableTh>
-                        <TableTh>Actions</TableTh>
-                    </TableTr>
-                </TableThead>
-                <TableTbody>
-                    {data.map((d) => (
-                        <PlayerRow key={d.playerID} player={d} />
-                    ))}
-                </TableTbody>
-            </Table>
+            <PlayerDataView />
         </>
     );
 }

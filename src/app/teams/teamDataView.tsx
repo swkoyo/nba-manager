@@ -18,6 +18,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import { Team } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { revalidateTag } from '../actions';
 
 export default function TeamDataView() {
     const { mutate } = useSWRConfig();
@@ -64,6 +65,8 @@ export default function TeamDataView() {
                 method: 'DELETE',
             });
             mutate('/api/teams');
+            mutate('/api/rosters');
+            revalidateTag('available');
         } catch (err) {
             console.error(err);
         }

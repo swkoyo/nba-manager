@@ -1,9 +1,19 @@
 import { turso } from '@/lib/db/turso';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
-        const { rows } = await turso.execute('SELECT * FROM Players');
+        const filterParams = request.nextUrl.searchParams.get('filter');
+        const searchParam = request.nextUrl.searchParams.get('search');
+        let select = 'SELECT playerID';
+        if (filterParams) {
+            select += `, ${filterParams} `;
+        }
+        let where = '';
+        if (searchParam) {
+            where += ` WHERE firstName LIKE '%${searchParam}%' OR lastName LIKE '%${searchParam}%'`;
+        }
+        const { rows } = await turso.execute(`${select} FROM Players${where}`);
         return NextResponse.json(rows);
     } catch (err) {
         console.error(err);

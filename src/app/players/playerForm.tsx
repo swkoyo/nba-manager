@@ -5,6 +5,7 @@ import { Box, Button, Group, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 import { redirect, revalidateTag } from '../actions';
+import { useSWRConfig } from 'swr';
 
 interface Props {
     player?: Player;
@@ -24,6 +25,7 @@ const schema = z.object({
 type Schema = z.infer<typeof schema>;
 
 export default function PlayerForm({ player }: Props) {
+    const { mutate } = useSWRConfig();
     const form = useForm({
         initialValues: {
             firstName: player?.firstName || '',
@@ -50,10 +52,13 @@ export default function PlayerForm({ player }: Props) {
         try {
             if (!player) {
                 await post(data);
+                mutate('/api/players');
             } else {
                 await put(data);
+                mutate('/api/players');
+                mutate('/api/rosters');
             }
-            revalidateTag('players');
+            revalidateTag('available');
             redirect('/players');
         } catch (err) {
             console.error(err);

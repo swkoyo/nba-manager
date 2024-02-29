@@ -15,23 +15,27 @@ import {
     TextInput,
 } from '@mantine/core';
 import useSWR, { useSWRConfig } from 'swr';
-import { PlayoffRound } from '@/lib/types';
+import { Player } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { revalidateTag } from '../actions';
 
-export default function PlayoffDataView() {
+export default function PlayerDataView() {
     const { mutate } = useSWRConfig();
-    const [showName, setShowName] = useState<boolean>(true);
+    const [showFirstName, setShowFirstName] = useState<boolean>(true);
+    const [showLastName, setShowLastName] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
 
-    const { data, isLoading, isValidating } = useSWR<PlayoffRound[]>(
-        '/api/playoffRounds',
+    const { data, isLoading, isValidating } = useSWR<Player[]>(
+        '/api/players',
         async () => {
-            let url = '/api/playoffRounds';
+            let url = '/api/players';
             const params: string[] = [];
-            if (showName) {
-                params.push('name');
+            if (showFirstName) {
+                params.push('firstName');
+            }
+            if (showLastName) {
+                params.push('lastName');
             }
             url += `?filter=${params.join(',')}`;
             if (searchVal) {
@@ -53,10 +57,10 @@ export default function PlayoffDataView() {
 
     async function deleteData(id: number) {
         try {
-            await fetch(`/api/playoffRounds/${id}`, {
+            await fetch(`/api/players/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/playoffRounds');
+            mutate('/api/players');
             mutate('/api/rosters');
             revalidateTag('available');
         } catch (err) {
@@ -65,12 +69,12 @@ export default function PlayoffDataView() {
     }
 
     function onClick() {
-        mutate('/api/playoffRounds');
+        mutate('/api/players');
     }
 
     useEffect(() => {
-        mutate('/api/playoffRounds');
-    }, [showName, mutate]);
+        mutate('/api/players');
+    }, [showFirstName, showLastName, mutate]);
 
     if (isLoading || isValidating) return <div>Loading...</div>;
 
@@ -78,17 +82,24 @@ export default function PlayoffDataView() {
         <>
             <Flex w='100%' justify='space-evenly'>
                 <Switch
-                    checked={showName}
+                    checked={showFirstName}
                     onChange={(event) =>
-                        setShowName(event.currentTarget.checked)
+                        setShowFirstName(event.currentTarget.checked)
                     }
-                    label='Show Name'
+                    label='Show First Name'
+                />
+                <Switch
+                    checked={showLastName}
+                    onChange={(event) =>
+                        setShowLastName(event.currentTarget.checked)
+                    }
+                    label='Show Last Name'
                 />
             </Flex>
             <Stack>
                 <TextInput
                     label='Search by value'
-                    placeholder='NBA Finals, Finals, etc'
+                    placeholder='LeBron, Jordan, etc'
                     value={searchVal}
                     onChange={(event) =>
                         setSearchVal(event.currentTarget.value)
@@ -104,32 +115,36 @@ export default function PlayoffDataView() {
                 <TableThead>
                     <TableTr>
                         <TableTh>ID</TableTh>
-                        {showName && <TableTh>Name</TableTh>}
+                        {showFirstName && <TableTh>First Name</TableTh>}
+                        {showLastName && <TableTh>Last Name</TableTh>}
                         <TableTh>Actions</TableTh>
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data?.map((playoffRound) => (
-                        <TableTr key={playoffRound.playoffRoundID}>
-                            <TableTd>{playoffRound.playoffRoundID}</TableTd>
-                            <TableTd>{playoffRound.name}</TableTd>
+                    {data?.map((player) => (
+                        <TableTr key={player.playerID}>
+                            <TableTd>{player.playerID}</TableTd>
+                            {showFirstName && (
+                                <TableTd>{player.firstName}</TableTd>
+                            )}
+                            {showLastName && (
+                                <TableTd>{player.lastName}</TableTd>
+                            )}
                             <TableTd>
                                 <Button
                                     size='xs'
                                     radius='xl'
-                                    mr={10}
+                                    mr='xs'
                                     component={Link}
-                                    href={`/playoffRounds/${playoffRound.playoffRoundID}/edit`}
+                                    href={`/players/${player.playerID}/edit`}
                                 >
                                     Edit
                                 </Button>
                                 <Button
-                                    onClick={() =>
-                                        deleteData(playoffRound.playoffRoundID)
-                                    }
                                     size='xs'
                                     radius='xl'
                                     color='red'
+                                    onClick={() => deleteData(player.playerID)}
                                 >
                                     Delete
                                 </Button>
