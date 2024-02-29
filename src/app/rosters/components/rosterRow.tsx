@@ -11,9 +11,13 @@ export default function RosterRow({ roster, setCurrentRoster }: Props) {
         <TableTr key={roster.rosterID}>
             <TableTd>{roster.rosterID}</TableTd>
             <TableTd>{roster.year}</TableTd>
-            <TableTd>{roster.team}</TableTd>
-            <TableTd>{roster.playoffRound || '-'}</TableTd>
-            <TableTd>{roster.players.join(', ')}</TableTd>
+            <TableTd>{`${roster.team.city} ${roster.team.name}`}</TableTd>
+            <TableTd>{roster.playoffRound?.name || '-'}</TableTd>
+            <TableTd>
+                {roster.players
+                    .map((player) => `${player.firstName} ${player.lastName}`)
+                    .join(', ')}
+            </TableTd>
             <TableTd>
                 <Button
                     size='xs'

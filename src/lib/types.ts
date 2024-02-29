@@ -14,6 +14,8 @@ export type Team = {
 export type Roster = {
     rosterID: number;
     year: string;
+    playoffRoundID: number | null;
+    teamID: number;
 };
 
 export type PlayoffRound = {
@@ -21,9 +23,8 @@ export type PlayoffRound = {
     name: string;
 };
 
-// TODO: Need to update when building BE query
 export type FullRoster = Roster & {
-    team: string;
-    players: string[];
-    playoffRound: string;
+    team: Team;
+    players: Player[];
+    playoffRound: PlayoffRound | null;
 };

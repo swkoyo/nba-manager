@@ -18,45 +18,41 @@ import { useEffect, useState } from 'react';
 import RosterForm from './components/rosterForm';
 import RosterRow from './components/rosterRow';
 
-const data: FullRoster[] = [
-    {
-        rosterID: 1,
-        year: '2024',
-        team: 'Los Angeles Lakers',
-        playoffRound: 'Conference Finals',
-        players: [
-            'LeBron James',
-            'Anthony Davis',
-            "D'Angelo Russell",
-            'Austin Reaves',
-            'Jaxson Hayes',
-        ],
-    },
-    {
-        rosterID: 2,
-        year: '2023',
-        team: 'Los Angeles Lakers',
-        playoffRound: '',
-        players: [
-            'LeBron James',
-            'Anthony Davis',
-            "D'Angelo Russell",
-            'Russell Westbrook',
-            'Rajon Rondo',
-        ],
-    },
-];
-
 export default function Rosters() {
     const [opened, { open, close }] = useDisclosure(false);
     const [currentRoster, setCurrentRoster] = useState<FullRoster | undefined>(
         undefined
     );
+    const [rosters, setRosters] = useState<FullRoster[]>([]);
+
+    async function getData() {
+        try {
+            let resp = await fetch('/api/rosters', {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await resp.json();
+
+            console.log('Recieved from API : ', data);
+
+            setRosters(data);
+        } catch (e) {
+            throw new Error('Error occured while calling Location API');
+        }
+    }
 
     function closeModal() {
         setCurrentRoster(undefined);
         close();
     }
+
+    useEffect(() => {
+        getData();
+    });
 
     useEffect(() => {
         if (currentRoster) {
@@ -89,7 +85,7 @@ export default function Rosters() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data.map((d) => (
+                    {rosters.map((d) => (
                         <RosterRow
                             key={d.rosterID}
                             roster={d}
