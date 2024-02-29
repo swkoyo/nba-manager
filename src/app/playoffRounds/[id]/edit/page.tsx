@@ -1,14 +1,12 @@
 import { PlayoffRound } from '@/lib/types';
 import { Center, Space, Title } from '@mantine/core';
 import PlayoffForm from '../../playoffForm';
+import { BASE_URL } from '@/lib/constants';
 
 async function getData(id: number): Promise<PlayoffRound> {
-    const res = await fetch(
-        `${process.env.VERCEL_URL}/api/playoffRounds/${id}`,
-        {
-            next: { tags: ['playoffRounds'] },
-        }
-    );
+    const res = await fetch(`${BASE_URL}/api/playoffRounds/${id}`, {
+        next: { tags: ['playoffRounds'] },
+    });
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }

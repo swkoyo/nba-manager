@@ -1,14 +1,12 @@
 import { Center, Space, Title } from '@mantine/core';
 import PlayerForm from '../../playerForm';
 import { Player } from '@/lib/types';
+import { BASE_URL } from '@/lib/constants';
 
 async function getData(id: number): Promise<Player> {
-    const res = await fetch(
-        `${process.env.VERCEL_URL}/api/players/${id}`,
-        {
-            next: { tags: ['players'] },
-        }
-    );
+    const res = await fetch(`${BASE_URL}/api/players/${id}`, {
+        next: { tags: ['players'] },
+    });
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }

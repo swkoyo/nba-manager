@@ -1,9 +1,10 @@
 import { Center, Space, Title } from '@mantine/core';
 import RosterForm from '../rosterForm';
 import { AvailableData } from '@/lib/types';
+import { BASE_URL } from '@/lib/constants';
 
 async function getData(): Promise<AvailableData> {
-    const res = await fetch(`${process.env.VERCEL_URL}/api/available`, {
+    const res = await fetch(`${BASE_URL}/api/available`, {
         next: { tags: ['teams', 'players', 'playoffRounds'] },
     });
     if (!res.ok) {

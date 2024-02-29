@@ -1,9 +1,10 @@
 import { Team } from '@/lib/types';
 import { Center, Space, Title } from '@mantine/core';
 import TeamForm from '../../teamForm';
+import { BASE_URL } from '@/lib/constants';
 
 async function getData(id: number): Promise<Team> {
-    const res = await fetch(`${process.env.VERCEL_URL}/api/teams/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/teams/${id}`, {
         next: { tags: ['teams'] },
     });
     if (!res.ok) {

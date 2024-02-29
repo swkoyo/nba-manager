@@ -1,25 +1,20 @@
 import { AvailableData, FullRoster } from '@/lib/types';
 import { Center, Space, Title } from '@mantine/core';
 import RosterForm from '../../rosterForm';
+import { BASE_URL } from '@/lib/constants';
 
 async function getData(
     id: number
 ): Promise<{ roster: FullRoster; available: AvailableData }> {
-    const res = await fetch(
-        `${process.env.VERCEL_URL}/api/rosters/${id}`,
-        {
-            next: { tags: ['rosters'] },
-        }
-    );
+    const res = await fetch(`${BASE_URL}/api/rosters/${id}`, {
+        next: { tags: ['rosters'] },
+    });
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }
-    const availableRes = await fetch(
-        `${process.env.VERCEL_URL}/api/available`,
-        {
-            next: { tags: ['teams', 'players', 'playoffRounds'] },
-        }
-    );
+    const availableRes = await fetch(`${BASE_URL}/api/available`, {
+        next: { tags: ['teams', 'players', 'playoffRounds'] },
+    });
     return {
         roster: await res.json(),
         available: await availableRes.json(),
