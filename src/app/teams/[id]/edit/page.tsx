@@ -3,7 +3,7 @@ import { Center, Space, Title } from '@mantine/core';
 import TeamForm from '../../teamForm';
 
 async function getData(id: number): Promise<Team> {
-    const res = await fetch(`http://localhost:3000/api/teams/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/teams/${id}`, {
         next: { tags: ['teams'] },
     });
     if (!res.ok) {

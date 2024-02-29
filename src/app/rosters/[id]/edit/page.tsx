@@ -5,15 +5,21 @@ import RosterForm from '../../rosterForm';
 async function getData(
     id: number
 ): Promise<{ roster: FullRoster; available: AvailableData }> {
-    const res = await fetch(`http://localhost:3000/api/rosters/${id}`, {
-        next: { tags: ['rosters'] },
-    });
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/rosters/${id}`,
+        {
+            next: { tags: ['rosters'] },
+        }
+    );
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }
-    const availableRes = await fetch('http://localhost:3000/api/available', {
-        next: { tags: ['teams', 'players', 'playoffRounds'] },
-    });
+    const availableRes = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/available`,
+        {
+            next: { tags: ['teams', 'players', 'playoffRounds'] },
+        }
+    );
     return {
         roster: await res.json(),
         available: await availableRes.json(),

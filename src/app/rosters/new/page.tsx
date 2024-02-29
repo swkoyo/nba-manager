@@ -3,7 +3,7 @@ import RosterForm from '../rosterForm';
 import { AvailableData } from '@/lib/types';
 
 async function getData(): Promise<AvailableData> {
-    const res = await fetch('http://localhost:3000/api/available', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/available`, {
         next: { tags: ['teams', 'players', 'playoffRounds'] },
     });
     if (!res.ok) {
