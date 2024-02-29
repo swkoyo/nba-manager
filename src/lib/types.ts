@@ -28,3 +28,9 @@ export type FullRoster = Roster & {
     players: Player[];
     playoffRound: PlayoffRound | null;
 };
+
+export type AvailableData = {
+    teams: Team[];
+    players: Player[];
+    playoffRounds: PlayoffRound[];
+};

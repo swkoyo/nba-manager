@@ -11,3 +11,11 @@ export async function findPlayerByID(playerID: number): Promise<Player | null> {
     }
     return rows[0] as unknown as Player;
 }
+
+export async function validatePlayerIDs(ids: number[]): Promise<boolean> {
+    const { rows } = await turso.execute({
+        sql: 'SELECT COUNT(*) FROM Players WHERE playerID IN (?)',
+        args: [ids.join(', ')],
+    });
+    return (rows[0]['COUNT (*)'] as number) === ids.length;
+}

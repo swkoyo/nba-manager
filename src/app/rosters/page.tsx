@@ -1,10 +1,7 @@
-'use client';
-
 import { FullRoster } from '@/lib/types';
 import {
     Button,
-    Flex,
-    Modal,
+    Center,
     Space,
     Table,
     TableTbody,
@@ -13,65 +10,30 @@ import {
     TableTr,
     Title,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import RosterForm from './components/rosterForm';
-import RosterRow from './components/rosterRow';
+import RosterRow from './rosterRow';
+import Link from 'next/link';
 
-export default function Rosters() {
-    const [opened, { open, close }] = useDisclosure(false);
-    const [currentRoster, setCurrentRoster] = useState<FullRoster | undefined>(
-        undefined
-    );
-    const [rosters, setRosters] = useState<FullRoster[]>([]);
-
-    async function getData() {
-        try {
-            let resp = await fetch('/api/rosters', {
-                method: 'GET',
-                cache: 'no-store',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const data = await resp.json();
-
-            console.log('Recieved from API : ', data);
-
-            setRosters(data);
-        } catch (e) {
-            throw new Error('Error occured while calling Location API');
-        }
-    }
-
-    function closeModal() {
-        setCurrentRoster(undefined);
-        close();
-    }
-
-    useEffect(() => {
-        getData();
+async function getData(): Promise<FullRoster[]> {
+    const res = await fetch('http://localhost:3000/api/rosters', {
+        next: { tags: ['rosters'] },
     });
+    if (!res.ok) {
+        throw new Error('Failed to fetch data');
+    }
+    return res.json();
+}
 
-    useEffect(() => {
-        if (currentRoster) {
-            open();
-        }
-    }, [currentRoster, open]);
+export default async function Rosters() {
+    const data = await getData();
     return (
         <>
-            <Modal
-                opened={opened}
-                onClose={closeModal}
-                title={`${currentRoster ? 'Edit' : 'Add'} Roster`}
-            >
-                <RosterForm close={closeModal} roster={currentRoster} />
-            </Modal>
-            <Flex align='center' justify='space-between'>
-                <Title order={1}>Browse Roster</Title>
-                <Button onClick={open}>Add New Roster</Button>
-            </Flex>
+            <Center>
+                <Title order={1}>Browse Rosters</Title>
+            </Center>
+            <Space h='md' />
+            <Button component={Link} href='/rosters/new' w='100%'>
+                Add New Roster
+            </Button>
             <Space h='md' />
             <Table>
                 <TableThead>
@@ -85,12 +47,8 @@ export default function Rosters() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {rosters.map((d) => (
-                        <RosterRow
-                            key={d.rosterID}
-                            roster={d}
-                            setCurrentRoster={setCurrentRoster}
-                        />
+                    {data.map((d) => (
+                        <RosterRow key={d.rosterID} roster={d} />
                     ))}
                 </TableTbody>
             </Table>
