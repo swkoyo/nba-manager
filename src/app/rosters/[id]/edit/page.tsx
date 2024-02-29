@@ -10,7 +10,8 @@ async function getData(
         next: { tags: ['rosters'] },
     });
     if (!res.ok) {
-        throw new Error('Failed to fetch data');
+        const text = await res.text();
+        throw new Error(text);
     }
     const availableRes = await fetch(`${BASE_URL}/api/available`, {
         next: { tags: ['teams', 'players', 'playoffRounds'] },

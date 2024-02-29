@@ -51,7 +51,8 @@ export default function RosterDataView() {
             }
             const res = await fetch(url);
             if (!res.ok) {
-                throw new Error('Failed to fetch data');
+                const text = await res.text();
+                throw new Error(text);
             }
             return res.json();
         },
