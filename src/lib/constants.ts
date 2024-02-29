@@ -1,6 +1,5 @@
-export const BASE_URL = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
+export const BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 export const STATES = [
     'AL',
