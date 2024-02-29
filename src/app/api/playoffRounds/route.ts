@@ -1,10 +1,22 @@
 import { turso } from '@/lib/db/turso';
 import { isExistingPlayoffRound } from './helpers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
-        const { rows } = await turso.execute('SELECT * FROM PlayoffRounds');
+        const filterParams = request.nextUrl.searchParams.get('filter');
+        const searchParam = request.nextUrl.searchParams.get('search');
+        let select = 'SELECT PlayoffRoundID';
+        if (filterParams) {
+            select += `, ${filterParams}`;
+        }
+        let where = '';
+        if (searchParam) {
+            where += ` WHERE name LIKE '%${searchParam}%'`;
+        }
+        const { rows } = await turso.execute(
+            `${select} FROM PlayoffRounds${where}`
+        );
         return NextResponse.json(rows);
     } catch (err) {
         console.error(err);
