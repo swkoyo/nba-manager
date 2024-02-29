@@ -1,5 +1,5 @@
 import { turso } from '@/lib/db/turso';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
     areExistingRosterPlayers,
     isExistingRoster,
@@ -9,26 +9,49 @@ import { DetailedRoster } from './types';
 import { findTeamByID } from '../teams/helpers';
 import { findPlayoffRoundByID } from '../playoffRounds/helpers';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        const filterParams = request.nextUrl.searchParams.get('filter');
+        const searchParam = request.nextUrl.searchParams.get('search');
+        let select = 'SELECT r.rosterID, r.teamID, r.playoffRoundID';
+        if (filterParams) {
+            for (const param of filterParams.split(',')) {
+                if (param === 'year') {
+                    select += ', r.year';
+                }
+                if (param === 'team') {
+                    select +=
+                        ', t.name AS teamName, t.city AS teamCity, t.state AS teamState';
+                }
+                if (param === 'playoffRound') {
+                    select += ', pr.name AS playoffRoundName';
+                }
+                if (param === 'players') {
+                    select +=
+                        ', p.playerID AS playerID, p.firstName AS playerFirstName, p.lastName AS playerLastName';
+                }
+            }
+        }
+        let where = '';
+        if (searchParam) {
+            where += `
+                WHERE r.year LIKE '%${searchParam}%'
+                OR t.name LIKE '%${searchParam}%'
+                OR t.city LIKE '%${searchParam}%'
+                OR t.state LIKE '%${searchParam}%'
+                OR pr.name LIKE '%${searchParam}%'
+                OR p.firstName LIKE '%${searchParam}%'
+                OR p.lastName LIKE '%${searchParam}%'
+            `;
+        }
         const { rows } = await turso.execute(`
-            SELECT
-                r.rosterID,
-                r.year,
-                r.teamID,
-                r.playoffRoundID,
-                t.name AS teamName,
-                t.city AS teamCity,
-                t.state AS teamState,
-                pr.name AS playoffRoundName,
-                p.playerID AS playerID,
-                p.firstName AS playerFirstName,
-                p.lastName AS playerLastName
+            ${select}
             FROM Rosters AS r
             JOIN Teams AS t ON r.teamID = t.teamID
             JOIN RosterPlayers AS rp ON rp.rosterID = r.rosterID
             JOIN Players AS p ON rp.playerID = p.playerID
             LEFT OUTER JOIN PlayoffRounds AS pr ON pr.playoffRoundID = r.playoffRoundID
+            ${where}
             ORDER BY r.year, t.name
         `);
         const res = serializerRoster(rows as unknown as DetailedRoster[]);

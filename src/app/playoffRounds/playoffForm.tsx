@@ -48,13 +48,13 @@ export default function PlayoffForm({
         try {
             if (!playoffRound) {
                 await post(data);
-                mutate('/api/playoffRounds');
             } else {
                 await put(data);
-                mutate('/api/playoffRounds');
                 mutate('/api/rosters');
+                revalidateTag('rosters');
             }
-            revalidateTag('available');
+            mutate('/api/playoffRounds');
+            revalidateTag('playoffRounds');
             redirect('/playoffRounds');
         } catch (err) {
             console.error(err);

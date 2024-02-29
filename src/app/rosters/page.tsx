@@ -1,30 +1,8 @@
-import { FullRoster } from '@/lib/types';
-import {
-    Button,
-    Center,
-    Space,
-    Table,
-    TableTbody,
-    TableTh,
-    TableThead,
-    TableTr,
-    Title,
-} from '@mantine/core';
-import RosterRow from './rosterRow';
+import { Button, Center, Space, Title } from '@mantine/core';
 import Link from 'next/link';
+import RosterDataView from './rosterDataView';
 
-async function getData(): Promise<FullRoster[]> {
-    const res = await fetch('http://localhost:3000/api/rosters', {
-        next: { tags: ['rosters'] },
-    });
-    if (!res.ok) {
-        throw new Error('Failed to fetch data');
-    }
-    return res.json();
-}
-
-export default async function Rosters() {
-    const data = await getData();
+export default function Rosters() {
     return (
         <>
             <Center>
@@ -35,23 +13,7 @@ export default async function Rosters() {
                 Add New Roster
             </Button>
             <Space h='md' />
-            <Table>
-                <TableThead>
-                    <TableTr>
-                        <TableTh>ID</TableTh>
-                        <TableTh>Year</TableTh>
-                        <TableTh>Team</TableTh>
-                        <TableTh>Playoff Round</TableTh>
-                        <TableTh>Players</TableTh>
-                        <TableTh>Actions</TableTh>
-                    </TableTr>
-                </TableThead>
-                <TableTbody>
-                    {data.map((d) => (
-                        <RosterRow key={d.rosterID} roster={d} />
-                    ))}
-                </TableTbody>
-            </Table>
+            <RosterDataView />
         </>
     );
 }

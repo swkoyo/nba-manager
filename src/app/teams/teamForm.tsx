@@ -60,13 +60,13 @@ export default function TeamForm({ team }: Props) {
         try {
             if (!team) {
                 await post(data);
-                mutate('/api/teams');
             } else {
                 await put(data);
-                mutate('/api/teams');
                 mutate('/api/rosters');
+                revalidateTag('rosters')
             }
-            revalidateTag('available');
+            mutate('/api/teams');
+            revalidateTag('teams');
             redirect('/teams');
         } catch (err) {
             console.error(err);

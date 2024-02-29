@@ -58,7 +58,8 @@ export default function PlayoffDataView() {
             });
             mutate('/api/playoffRounds');
             mutate('/api/rosters');
-            revalidateTag('available');
+            revalidateTag('playoffRounds');
+            revalidateTag('rosters');
         } catch (err) {
             console.error(err);
         }

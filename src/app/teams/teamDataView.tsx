@@ -66,7 +66,8 @@ export default function TeamDataView() {
             });
             mutate('/api/teams');
             mutate('/api/rosters');
-            revalidateTag('available');
+            revalidateTag('teams');
+            revalidateTag('rosters');
         } catch (err) {
             console.error(err);
         }

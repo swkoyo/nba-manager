@@ -52,13 +52,13 @@ export default function PlayerForm({ player }: Props) {
         try {
             if (!player) {
                 await post(data);
-                mutate('/api/players');
             } else {
                 await put(data);
-                mutate('/api/players');
                 mutate('/api/rosters');
+                revalidateTag('rosters');
             }
-            revalidateTag('available');
+            mutate('/api/players');
+            revalidateTag('players');
             redirect('/players');
         } catch (err) {
             console.error(err);

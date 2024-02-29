@@ -7,6 +7,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 import { redirect, revalidateTag } from '../actions';
 import Link from 'next/link';
+import { useSWRConfig } from 'swr';
 
 interface Props {
     roster?: FullRoster;
@@ -21,6 +22,7 @@ export default function RosterForm({
     teams,
     playoffRounds,
 }: Props) {
+    const { mutate } = useSWRConfig();
     const schema = z.object({
         year: z
             .string()
@@ -116,6 +118,7 @@ export default function RosterForm({
             } else {
                 await put(data);
             }
+            mutate('/api/rosters');
             revalidateTag('rosters');
             redirect('/rosters');
         } catch (err) {

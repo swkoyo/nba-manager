@@ -15,27 +15,35 @@ import {
     TextInput,
 } from '@mantine/core';
 import useSWR, { useSWRConfig } from 'swr';
-import { Player } from '@/lib/types';
+import { FullRoster } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { revalidateTag } from '../actions';
 
-export default function PlayerDataView() {
+export default function RosterDataView() {
     const { mutate } = useSWRConfig();
-    const [showFirstName, setShowFirstName] = useState<boolean>(true);
-    const [showLastName, setShowLastName] = useState<boolean>(true);
+    const [showYear, setShowYear] = useState<boolean>(true);
+    const [showTeam, setShowTeam] = useState<boolean>(true);
+    const [showPlayoffRound, setShowPlayoffRound] = useState<boolean>(true);
+    const [showPlayers, setShowPlayers] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
 
-    const { data, isLoading, isValidating } = useSWR<Player[]>(
-        '/api/players',
+    const { data, isLoading, isValidating } = useSWR<FullRoster[]>(
+        '/api/rosters',
         async () => {
-            let url = '/api/players';
+            let url = '/api/rosters';
             const params: string[] = [];
-            if (showFirstName) {
-                params.push('firstName');
+            if (showYear) {
+                params.push('year');
             }
-            if (showLastName) {
-                params.push('lastName');
+            if (showTeam) {
+                params.push('team');
+            }
+            if (showPlayoffRound) {
+                params.push('playoffRound');
+            }
+            if (showPlayers) {
+                params.push('players');
             }
             url += `?filter=${params.join(',')}`;
             if (searchVal) {
@@ -57,12 +65,10 @@ export default function PlayerDataView() {
 
     async function deleteData(id: number) {
         try {
-            await fetch(`/api/players/${id}`, {
+            await fetch(`/api/rosters/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/players');
             mutate('/api/rosters');
-            revalidateTag('players');
             revalidateTag('rosters');
         } catch (err) {
             console.error(err);
@@ -70,12 +76,12 @@ export default function PlayerDataView() {
     }
 
     function onClick() {
-        mutate('/api/players');
+        mutate('/api/rosters');
     }
 
     useEffect(() => {
-        mutate('/api/players');
-    }, [showFirstName, showLastName, mutate]);
+        mutate('/api/rosters');
+    }, [showPlayers, showPlayoffRound, showTeam, showYear, mutate]);
 
     if (isLoading || isValidating) return <div>Loading...</div>;
 
@@ -83,24 +89,38 @@ export default function PlayerDataView() {
         <>
             <Flex w='100%' justify='space-evenly'>
                 <Switch
-                    checked={showFirstName}
+                    checked={showYear}
                     onChange={(event) =>
-                        setShowFirstName(event.currentTarget.checked)
+                        setShowYear(event.currentTarget.checked)
                     }
-                    label='Show First Name'
+                    label='Show Year'
                 />
                 <Switch
-                    checked={showLastName}
+                    checked={showTeam}
                     onChange={(event) =>
-                        setShowLastName(event.currentTarget.checked)
+                        setShowTeam(event.currentTarget.checked)
                     }
-                    label='Show Last Name'
+                    label='Show Team'
+                />
+                <Switch
+                    checked={showPlayoffRound}
+                    onChange={(event) =>
+                        setShowPlayoffRound(event.currentTarget.checked)
+                    }
+                    label='Show Playoff Round'
+                />
+                <Switch
+                    checked={showPlayers}
+                    onChange={(event) =>
+                        setShowPlayers(event.currentTarget.checked)
+                    }
+                    label='Show Players'
                 />
             </Flex>
             <Stack>
                 <TextInput
                     label='Search by value'
-                    placeholder='LeBron, Jordan, etc'
+                    placeholder='Lakers, Lebron, 2024, etc'
                     value={searchVal}
                     onChange={(event) =>
                         setSearchVal(event.currentTarget.value)
@@ -116,20 +136,35 @@ export default function PlayerDataView() {
                 <TableThead>
                     <TableTr>
                         <TableTh>ID</TableTh>
-                        {showFirstName && <TableTh>First Name</TableTh>}
-                        {showLastName && <TableTh>Last Name</TableTh>}
+                        {showYear && <TableTh>Year</TableTh>}
+                        {showTeam && <TableTh>Team</TableTh>}
+                        {showPlayoffRound && <TableTh>Playoff Round</TableTh>}
+                        {showPlayers && <TableTh>Players</TableTh>}
                         <TableTh>Actions</TableTh>
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data?.map((player) => (
-                        <TableTr key={player.playerID}>
-                            <TableTd>{player.playerID}</TableTd>
-                            {showFirstName && (
-                                <TableTd>{player.firstName}</TableTd>
+                    {data?.map((roster) => (
+                        <TableTr key={roster.rosterID}>
+                            <TableTd>{roster.rosterID}</TableTd>
+                            {showYear && <TableTd>{roster.year}</TableTd>}
+                            {showTeam && (
+                                <TableTd>{`${roster.team.city} ${roster.team.name}`}</TableTd>
                             )}
-                            {showLastName && (
-                                <TableTd>{player.lastName}</TableTd>
+                            {showPlayoffRound && (
+                                <TableTd>
+                                    {roster.playoffRound?.name || '-'}
+                                </TableTd>
+                            )}
+                            {showPlayers && (
+                                <TableTd>
+                                    {roster.players
+                                        .map(
+                                            (player) =>
+                                                `${player.firstName} ${player.lastName}`
+                                        )
+                                        .join(', ')}
+                                </TableTd>
                             )}
                             <TableTd>
                                 <Button
@@ -137,7 +172,7 @@ export default function PlayerDataView() {
                                     radius='xl'
                                     mr='xs'
                                     component={Link}
-                                    href={`/players/${player.playerID}/edit`}
+                                    href={`/rosters/${roster.rosterID}/edit`}
                                 >
                                     Edit
                                 </Button>
@@ -145,7 +180,7 @@ export default function PlayerDataView() {
                                     size='xs'
                                     radius='xl'
                                     color='red'
-                                    onClick={() => deleteData(player.playerID)}
+                                    onClick={() => deleteData(roster.rosterID)}
                                 >
                                     Delete
                                 </Button>

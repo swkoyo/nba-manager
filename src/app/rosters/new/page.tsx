@@ -4,7 +4,7 @@ import { AvailableData } from '@/lib/types';
 
 async function getData(): Promise<AvailableData> {
     const res = await fetch('http://localhost:3000/api/available', {
-        next: { tags: ['rosters', 'players', 'teams'] },
+        next: { tags: ['teams', 'players', 'playoffRounds'] },
     });
     if (!res.ok) {
         throw new Error('Failed to fetch data');
