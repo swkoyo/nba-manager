@@ -1,10 +1,20 @@
 import { turso } from '@/lib/db/turso';
 import { isExistingTeam } from './helpers';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
-        const { rows } = await turso.execute('SELECT * FROM Teams');
+        const filterParams = request.nextUrl.searchParams.get('filter');
+        const searchParam = request.nextUrl.searchParams.get('search');
+        let select = 'SELECT teamID';
+        if (filterParams) {
+            select += `, ${filterParams} `;
+        }
+        let where = '';
+        if (searchParam) {
+            where += ` WHERE name LIKE '%${searchParam}%' OR city LIKE '%${searchParam}%' OR state LIKE '%${searchParam}%'`;
+        }
+        const { rows } = await turso.execute(`${select} FROM Teams${where}`);
         return NextResponse.json(rows);
     } catch (err) {
         console.error(err);
@@ -15,7 +25,7 @@ export async function GET() {
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     try {
         const { name, city, state } = await request.json();
         const isTaken = await isExistingTeam(name);

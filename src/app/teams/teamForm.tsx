@@ -6,8 +6,9 @@ import { Box, Button, Group, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { z } from 'zod';
 import { zodResolver } from '@mantine/form';
-import { redirect, revalidateTag } from '../actions';
+import { redirect } from '../actions';
 import Link from 'next/link';
+import { useSWRConfig } from 'swr';
 
 const schema = z.object({
     name: z
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export default function TeamForm({ team }: Props) {
+    const { mutate } = useSWRConfig();
     const form = useForm({
         initialValues: {
             name: team?.name || '',
@@ -58,10 +60,12 @@ export default function TeamForm({ team }: Props) {
         try {
             if (!team) {
                 await post(data);
+                mutate('/api/teams');
             } else {
                 await put(data);
+                mutate('/api/teams');
+                mutate('/api/rosters');
             }
-            revalidateTag('teams');
             redirect('/teams');
         } catch (err) {
             console.error(err);
