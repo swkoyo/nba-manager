@@ -1,10 +1,7 @@
-'use client';
-
 import { Team } from '@/lib/types';
 import {
     Button,
-    Flex,
-    Modal,
+    Center,
     Space,
     Table,
     TableTbody,
@@ -13,64 +10,30 @@ import {
     TableTr,
     Title,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import TeamForm from './components/teamForm';
-import TeamRow from './components/teamRow';
+import Link from 'next/link';
+import TeamRow from './teamRow';
 
-export default function Teams() {
-    const [opened, { open, close }] = useDisclosure(false);
-    const [currentTeam, setCurrentTeam] = useState<Team | undefined>(undefined);
-    const [teams, setTeams] = useState<Team[]>([]);
-
-    function closeModal() {
-        setCurrentTeam(undefined);
-        close();
-    }
-
-    async function getData() {
-        try {
-            let resp = await fetch('/api/teams', {
-                method: 'GET',
-                cache: 'no-store',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const data = await resp.json();
-
-            console.log('Recieved from API : ', data);
-
-            setTeams(data);
-        } catch (e) {
-            throw new Error('Error occured while calling Location API');
-        }
-    }
-
-    useEffect(() => {
-        getData();
+async function getData(): Promise<Team[]> {
+    const res = await fetch('http://localhost:3000/api/teams', {
+        next: { tags: ['teams'] },
     });
+    if (!res.ok) {
+        throw new Error('Failed to fetch data');
+    }
+    return res.json();
+}
 
-    useEffect(() => {
-        if (currentTeam) {
-            open();
-        }
-    }, [currentTeam, open]);
-
+export default async function Teams() {
+    const data = await getData();
     return (
         <>
-            <Modal
-                opened={opened}
-                onClose={closeModal}
-                title={`${currentTeam ? 'Edit' : 'Add'} Team`}
-            >
-                <TeamForm close={closeModal} team={currentTeam} />
-            </Modal>
-            <Flex align='center' justify='space-between'>
+            <Center>
                 <Title order={1}>Browse Team</Title>
-                <Button onClick={open}>Add New Team</Button>
-            </Flex>
+            </Center>
+            <Space h='md' />
+            <Button component={Link} href='/teams/new' w='100%'>
+                Add New Team
+            </Button>
             <Space h='md' />
             <Table>
                 <TableThead>
@@ -83,12 +46,8 @@ export default function Teams() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {teams.map((d) => (
-                        <TeamRow
-                            key={d.teamID}
-                            team={d}
-                            setCurrentTeam={setCurrentTeam}
-                        />
+                    {data.map((d) => (
+                        <TeamRow key={d.teamID} team={d} />
                     ))}
                 </TableTbody>
             </Table>

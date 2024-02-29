@@ -1,5 +1,4 @@
 import { turso } from '@/lib/db/turso';
-import { findPlayerByID } from './helpers';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -27,49 +26,6 @@ export async function POST(request: Request) {
             args: [firstName, lastName],
         });
         return NextResponse.json(rows[0], { status: 201 });
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json(
-            { message: (err as Error).message },
-            { status: 400 }
-        );
-    }
-}
-
-export async function PUT(request: Request) {
-    try {
-        const { playerID, firstName, lastName } = await request.json();
-        let player = await findPlayerByID(playerID);
-        if (!player) {
-            throw new Error(`Player ${playerID} not found`);
-        }
-        await turso.execute({
-            sql: 'UPDATE Players SET firstName=?, lastName=? WHERE playerID=?',
-            args: [firstName, lastName, playerID],
-        });
-        player = await findPlayerByID(playerID);
-        return NextResponse.json(player, { status: 200 });
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json(
-            { message: (err as Error).message },
-            { status: 400 }
-        );
-    }
-}
-
-export async function DELETE(request: Request) {
-    try {
-        const { playerID } = await request.json();
-        const player = await findPlayerByID(playerID);
-        if (!player) {
-            throw new Error(`Player ${playerID} not found`);
-        }
-        await turso.execute({
-            sql: 'DELETE FROM Players WHERE playerID=?',
-            args: [playerID],
-        });
-        return NextResponse.json({ message: 'Success' }, { status: 200 });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

@@ -3,7 +3,9 @@ import { Center, Space, Title } from '@mantine/core';
 import PlayoffForm from '../../playoffForm';
 
 async function getData(id: number): Promise<PlayoffRound> {
-    const res = await fetch(`http://localhost:3000/api/playoffRounds/${id}`);
+    const res = await fetch(`http://localhost:3000/api/playoffRounds/${id}`, {
+        next: { tags: ['playoffRounds'] },
+    });
     if (!res.ok) {
         throw new Error('Failed to fetch data');
     }
