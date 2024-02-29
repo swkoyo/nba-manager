@@ -52,7 +52,7 @@ export default function RootLayout({
                             <Button variant="subtle" component={Link} href="/rosters">Rosters</Button>
                             <Button variant="subtle" component={Link} href="/players">Players</Button>
                             <Button variant="subtle" component={Link} href="/teams">Teams</Button>
-                            <Button variant="subtle" component={Link} href="/playoffs">Playoff Rounds</Button>
+                            <Button variant="subtle" component={Link} href="/playoffRounds">Playoff Rounds</Button>
                         </AppShellNavbar>
                         <AppShellMain>
                             <Container>{children}</Container>
