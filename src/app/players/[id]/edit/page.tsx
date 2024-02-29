@@ -4,7 +4,7 @@ import { Player } from '@/lib/types';
 
 async function getData(id: number): Promise<Player> {
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/players/${id}`,
+        `${process.env.VERCEL_URL}/api/players/${id}`,
         {
             next: { tags: ['players'] },
         }

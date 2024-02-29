@@ -6,7 +6,7 @@ async function getData(
     id: number
 ): Promise<{ roster: FullRoster; available: AvailableData }> {
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/rosters/${id}`,
+        `${process.env.VERCEL_URL}/api/rosters/${id}`,
         {
             next: { tags: ['rosters'] },
         }
@@ -15,7 +15,7 @@ async function getData(
         throw new Error('Failed to fetch data');
     }
     const availableRes = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/available`,
+        `${process.env.VERCEL_URL}/api/available`,
         {
             next: { tags: ['teams', 'players', 'playoffRounds'] },
         }

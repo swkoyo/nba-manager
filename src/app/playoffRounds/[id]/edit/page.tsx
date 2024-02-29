@@ -4,7 +4,7 @@ import PlayoffForm from '../../playoffForm';
 
 async function getData(id: number): Promise<PlayoffRound> {
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/playoffRounds/${id}`,
+        `${process.env.VERCEL_URL}/api/playoffRounds/${id}`,
         {
             next: { tags: ['playoffRounds'] },
         }
