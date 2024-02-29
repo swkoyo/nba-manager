@@ -1,3 +1,36 @@
+# Running Locally
+
+## Requirements
+- Node
+- [Bun](https://bun.sh/)
+- [Turso CLI](https://docs.turso.tech/cli/introduction)
+
+## Starting local turso DB
+Run the command below to start a local database
+```bash
+turso dev --db-file local.db
+```
+
+## Setting up env
+Copy the `.env.example` to a new file `.env.local`. Set the two values to:
+- `TURSO_DATABASE_URL`="http://127.0.0.1:8080"
+- `TURSO_AUTH_TOKEN`=""
+
+## Run initial migrations and seed
+```bash
+// Run migration to create db tables
+bun run ./src/lib/db/migration.ts
+
+// Run seeder to populate db
+bun run ./src/lib/db/seed.ts
+```
+
+## Start the app
+```bash
+// Start the nextjs app locally
+npm run dev
+```
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
