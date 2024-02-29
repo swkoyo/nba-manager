@@ -47,8 +47,8 @@ export default function TeamDataView() {
             }
             const res = await fetch(url);
             if (!res.ok) {
-                const text = await res.text();
-                throw new Error(text);
+                const { message } = await res.json();
+                throw new Error(message);
             }
             return res.json();
         },

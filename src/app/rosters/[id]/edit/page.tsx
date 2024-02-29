@@ -10,8 +10,8 @@ async function getData(
         next: { tags: ['rosters'] },
     });
     if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
+        const { message } = await res.json();
+        throw new Error(message);
     }
     const availableRes = await fetch(`${BASE_URL}/api/available`, {
         next: { tags: ['teams', 'players', 'playoffRounds'] },

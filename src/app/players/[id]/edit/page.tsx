@@ -8,8 +8,8 @@ async function getData(id: number): Promise<Player> {
         next: { tags: ['players'] },
     });
     if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text);
+        const { message } = await res.json();
+        throw new Error(message);
     }
     return res.json();
 }
