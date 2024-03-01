@@ -153,7 +153,7 @@ INSERT INTO Rosters (year, teamID, playoffRoundID) VALUES
     ('2022', 12, NULL),
     ('2022', 13, NULL),
     ('2022', 14, NULL),
-    ('2022', 15, NULL),
+    ('2022', 15, NULL)
 `;
 
 const SEED_ROSTER_PLAYERS_SQL = `
