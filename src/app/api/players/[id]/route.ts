@@ -24,7 +24,7 @@ export async function PUT(
 ) {
     try {
         const { firstName, lastName } = await request.json();
-        let player = await findPlayerByID(params.id);
+        const player = await findPlayerByID(params.id);
         if (!player) {
             throw new Error(`Player ${params.id} not found`);
         }
@@ -32,8 +32,7 @@ export async function PUT(
             sql: 'UPDATE Players SET firstName=?, lastName=? WHERE playerID=?',
             args: [firstName, lastName, params.id],
         });
-        player = await findPlayerByID(params.id);
-        return NextResponse.json(player);
+        return NextResponse.json({ message: 'Success' });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

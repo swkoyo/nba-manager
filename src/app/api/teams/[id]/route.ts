@@ -24,7 +24,7 @@ export async function PUT(
 ) {
     try {
         const { name, city, state } = await request.json();
-        let team = await findTeamByID(params.id);
+        const team = await findTeamByID(params.id);
         if (!team) {
             throw new Error(`Team ${params.id} not found`);
         }
@@ -36,8 +36,7 @@ export async function PUT(
             sql: 'UPDATE Teams SET name=?, city=?, state=? WHERE teamID=?',
             args: [name, city, state, params.id],
         });
-        team = await findTeamByID(params.id);
-        return NextResponse.json(team);
+        return NextResponse.json({ message: 'Success' });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

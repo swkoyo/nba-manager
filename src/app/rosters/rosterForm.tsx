@@ -53,9 +53,10 @@ export default function RosterForm({
         players: z
             .string()
             .array()
-            .length(5, { message: 'Need to give 5 players per roster' })
+            .max(5, { message: 'Five players allowed at maximum' })
             .refine(
                 (data) => {
+                    if (data.length === 0) return true;
                     for (const p of data) {
                         if (
                             players.some(
@@ -177,7 +178,7 @@ export default function RosterForm({
                 <MultiSelect
                     label='Players'
                     withAsterisk
-                    placeholder='Pick 5 players'
+                    placeholder='Pick up to 5 players'
                     data={playerOption}
                     maxValues={5}
                     searchable

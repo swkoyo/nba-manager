@@ -142,14 +142,18 @@ export default function RosterDataView() {
                                 </TableTd>
                             )}
                             {showPlayers && (
+                                /* eslint-disable */
                                 <TableTd>
-                                    {roster.players
-                                        .map(
-                                            (player) =>
-                                                `${player.firstName} ${player.lastName}`
-                                        )
-                                        .join(', ')}
+                                    {roster.players.length > 0
+                                        ? roster.players
+                                              .map(
+                                                  (player) =>
+                                                      `${player.firstName} ${player.lastName}`
+                                              )
+                                              .join(', ')
+                                        : '-'}
                                 </TableTd>
+                                /* eslint-enable */
                             )}
                             <TableTd>
                                 <Button

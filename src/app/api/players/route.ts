@@ -31,11 +31,7 @@ export async function POST(request: Request) {
             sql: 'INSERT INTO Players (firstName, lastName) VALUES (?, ?)',
             args: [firstName, lastName],
         });
-        const { rows } = await turso.execute({
-            sql: 'SELECT * FROM Players WHERE firstName=? AND lastName=? ORDER BY playerID DESC LIMIT 1',
-            args: [firstName, lastName],
-        });
-        return NextResponse.json(rows[0], { status: 201 });
+        return NextResponse.json({ message: 'Success' }, { status: 201 });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

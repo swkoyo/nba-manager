@@ -31,11 +31,13 @@ export function serializerRoster(data: DetailedRoster[]): FullRoster[] {
                 players: [],
             };
         }
-        rosters[d.rosterID].players.push({
-            playerID: d.playerID,
-            firstName: d.playerFirstName,
-            lastName: d.playerLastName,
-        });
+        if (d.playerID && d.playerFirstName && d.playerLastName) {
+            rosters[d.rosterID].players.push({
+                playerID: d.playerID,
+                firstName: d.playerFirstName,
+                lastName: d.playerLastName,
+            });
+        }
     }
 
     for (const rosterID in rosters) {

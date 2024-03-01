@@ -5,7 +5,7 @@ export type DetailedRoster = Roster & {
     teamCity: string;
     teamState: string;
     playoffRoundName: string | null;
-    playerID: number;
-    playerFirstName: string;
-    playerLastName: string;
+    playerID: number | null;
+    playerFirstName: string | null;
+    playerLastName: string | null;
 }

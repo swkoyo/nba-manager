@@ -48,9 +48,9 @@ export async function GET(request: NextRequest) {
             ${select}
             FROM Rosters AS r
             JOIN Teams AS t ON r.teamID = t.teamID
-            JOIN RosterPlayers AS rp ON rp.rosterID = r.rosterID
-            JOIN Players AS p ON rp.playerID = p.playerID
             LEFT OUTER JOIN PlayoffRounds AS pr ON pr.playoffRoundID = r.playoffRoundID
+            LEFT OUTER JOIN RosterPlayers AS rp ON rp.rosterID = r.rosterID
+            LEFT OUTER JOIN Players AS p ON rp.playerID = p.playerID
             ${where}
             ORDER BY r.year, t.name
         `);

@@ -28,9 +28,9 @@ export async function GET(_: Request, { params }: { params: { id: number } }) {
                 p.lastName AS playerLastName
             FROM Rosters AS r
             JOIN Teams AS t ON r.teamID = t.teamID
-            JOIN RosterPlayers AS rp ON rp.rosterID = r.rosterID
-            JOIN Players AS p ON rp.playerID = p.playerID
             LEFT OUTER JOIN PlayoffRounds AS pr ON pr.playoffRoundID = r.playoffRoundID
+            LEFT OUTER JOIN RosterPlayers AS rp ON rp.rosterID = r.rosterID
+            LEFT OUTER JOIN Players AS p ON rp.playerID = p.playerID
             WHERE r.rosterID = ?
         `,
             args: [params.id],
@@ -67,6 +67,7 @@ export async function PUT(
         if (await isExistingRoster(teamID, year, params.id)) {
             throw new Error('Roster already exists');
         }
+
         const playerIDRes = await turso.execute(
             `SELECT COUNT(*) FROM Players WHERE playerID IN (${playerIDs.join(
                 ', '
@@ -78,7 +79,6 @@ export async function PUT(
         if (await areExistingRosterPlayers(year, playerIDs, params.id)) {
             throw new Error('Players are already in rosters during this year');
         }
-        const transaction = await turso.transaction('write');
 
         const existingPlayerIDRes = await turso.execute({
             sql: `SELECT playerID FROM RosterPlayers WHERE rosterID=?`,
@@ -99,6 +99,8 @@ export async function PUT(
             if (!existingPlayerIDs.includes(playerID))
                 [newPlayerIDs.push(playerID)];
         }
+
+        const transaction = await turso.transaction('write');
 
         try {
             await transaction.execute({

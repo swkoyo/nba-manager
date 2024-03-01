@@ -38,11 +38,7 @@ export async function POST(request: Request) {
             sql: 'INSERT INTO PlayoffRounds (name) VALUES (?)',
             args: [name],
         });
-        const { rows } = await turso.execute({
-            sql: 'SELECT * FROM PlayoffRounds WHERE name=?',
-            args: [name],
-        });
-        return NextResponse.json(rows[0], { status: 201 });
+        return NextResponse.json({ message: 'Success' }, { status: 201 });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

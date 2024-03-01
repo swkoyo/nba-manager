@@ -24,7 +24,7 @@ export async function PUT(
 ) {
     try {
         const { name } = await request.json();
-        let playoffRound = await findPlayoffRoundByID(params.id);
+        const playoffRound = await findPlayoffRoundByID(params.id);
         if (!playoffRound) {
             throw new Error(`PlayoffRound ${params.id} not found`);
         }
@@ -36,8 +36,7 @@ export async function PUT(
             sql: 'UPDATE PlayoffRounds SET name=? WHERE playoffRoundID=?',
             args: [name, params.id],
         });
-        playoffRound = await findPlayoffRoundByID(params.id);
-        return NextResponse.json(playoffRound);
+        return NextResponse.json({ message: 'Success' });
     } catch (err) {
         console.error(err);
         return NextResponse.json(

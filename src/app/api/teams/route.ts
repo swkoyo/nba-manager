@@ -36,11 +36,7 @@ export async function POST(request: NextRequest) {
             sql: 'INSERT INTO Teams (name, city, state) VALUES (?, ?, ?)',
             args: [name, city, state],
         });
-        const { rows } = await turso.execute({
-            sql: 'SELECT * FROM Teams WHERE name=?',
-            args: [name],
-        });
-        return NextResponse.json(rows[0], { status: 201 });
+        return NextResponse.json({ message: 'Success' }, { status: 201 });
     } catch (err) {
         console.error(err);
         return NextResponse.json(
