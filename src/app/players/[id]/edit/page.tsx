@@ -1,25 +1,20 @@
+'use client';
+
 import { Center, Space, Title } from '@mantine/core';
 import PlayerForm from '../../playerForm';
-import { Player } from '@/lib/types';
-import { BASE_URL } from '@/lib/constants';
+import { usePlayer } from '@/app/swr';
 
-async function getData(id: number): Promise<Player> {
-    const res = await fetch(`${BASE_URL}/api/players/${id}`, {
-        next: { tags: ['players'] },
-    });
-    if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message);
+export default function EditPlayerPage({ params }: { params: { id: number } }) {
+    const { data, isLoading, error } = usePlayer(params.id);
+
+    if (error) {
+        return <div>Error</div>;
     }
-    return res.json();
-}
 
-export default async function EditPlayerPage({
-    params,
-}: {
-    params: { id: number };
-}) {
-    const data = await getData(params.id);
+    if (isLoading || !data) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <Center>

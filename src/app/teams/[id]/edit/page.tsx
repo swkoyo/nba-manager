@@ -1,25 +1,20 @@
-import { Team } from '@/lib/types';
+'use client';
+
 import { Center, Space, Title } from '@mantine/core';
 import TeamForm from '../../teamForm';
-import { BASE_URL } from '@/lib/constants';
+import { useTeam } from '@/app/swr';
 
-async function getData(id: number): Promise<Team> {
-    const res = await fetch(`${BASE_URL}/api/teams/${id}`, {
-        next: { tags: ['teams'] },
-    });
-    if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message);
+export default function EditTeamPage({ params }: { params: { id: number } }) {
+    const { data, isLoading, error } = useTeam(params.id);
+
+    if (error) {
+        return <div>Error</div>;
     }
-    return res.json();
-}
 
-export default async function EditTeamPage({
-    params,
-}: {
-    params: { id: number };
-}) {
-    const data = await getData(params.id);
+    if (isLoading || !data) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <Center>

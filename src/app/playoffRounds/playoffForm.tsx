@@ -5,7 +5,7 @@ import { Box, Button, Group, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import Link from 'next/link';
 import { z } from 'zod';
-import { redirect, revalidateTag } from '../actions';
+import { redirect } from '../actions';
 import { useSWRConfig } from 'swr';
 
 const schema = z.object({
@@ -51,10 +51,10 @@ export default function PlayoffForm({
             } else {
                 await put(data);
                 mutate('/api/rosters');
-                revalidateTag('rosters');
+                mutate(`/api/playoffRounds/${playoffRound.playoffRoundID}`);
             }
             mutate('/api/playoffRounds');
-            revalidateTag('playoffRounds');
+            mutate('/api/available');
             redirect('/playoffRounds');
         } catch (err) {
             console.error(err);

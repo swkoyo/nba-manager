@@ -1,21 +1,18 @@
+'use client';
+
 import { Center, Space, Title } from '@mantine/core';
 import RosterForm from '../rosterForm';
-import { AvailableData } from '@/lib/types';
-import { BASE_URL } from '@/lib/constants';
+import { useAvailable } from '@/app/swr';
 
-async function getData(): Promise<AvailableData> {
-    const res = await fetch(`${BASE_URL}/api/available`, {
-        next: { tags: ['teams', 'players', 'playoffRounds'] },
-    });
-    if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message);
+export default function AddNewRoster() {
+    const { data, isLoading, error } = useAvailable();
+
+    if (error) return <div>Error</div>;
+
+    if (isLoading || !data) {
+        return <div>Loading...</div>;
     }
-    return res.json();
-}
 
-export default async function AddNewRoster() {
-    const { players, teams, playoffRounds } = await getData();
     return (
         <>
             <Center>
@@ -23,9 +20,9 @@ export default async function AddNewRoster() {
             </Center>
             <Space h='md' />
             <RosterForm
-                players={players}
-                teams={teams}
-                playoffRounds={playoffRounds}
+                players={data.players}
+                teams={data.teams}
+                playoffRounds={data.playoffRounds}
             />
         </>
     );

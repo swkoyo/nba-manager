@@ -14,75 +14,58 @@ import {
     TableTr,
     TextInput,
 } from '@mantine/core';
-import useSWR, { useSWRConfig } from 'swr';
-import { Team } from '@/lib/types';
+import { useSWRConfig } from 'swr';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { revalidateTag } from '../actions';
+import { useAllTeams } from '../swr';
 
 export default function TeamDataView() {
-    const { mutate } = useSWRConfig();
     const [showName, setShowName] = useState<boolean>(true);
     const [showCity, setShowCity] = useState<boolean>(true);
     const [showState, setShowState] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
+    const [inputVal, setInputVal] = useState<string>('');
+    const { mutate } = useSWRConfig();
 
-    const { data, isLoading, isValidating } = useSWR<Team[]>(
-        '/api/teams',
-        async () => {
-            let url = '/api/teams';
-            const params: string[] = [];
-            if (showName) {
-                params.push('name');
-            }
-            if (showCity) {
-                params.push('city');
-            }
-            if (showState) {
-                params.push('state');
-            }
-            url += `?filter=${params.join(',')}`;
-            if (searchVal) {
-                url += `&search=${searchVal}`;
-            }
-            const res = await fetch(url);
-            if (!res.ok) {
-                const { message } = await res.json();
-                throw new Error(message);
-            }
-            return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
-        }
-    );
+    const {
+        data,
+        isLoading,
+        error,
+        mutate: dataMutate,
+    } = useAllTeams({
+        showName,
+        showCity,
+        showState,
+        searchVal,
+    });
 
     async function deleteData(id: number) {
         try {
             await fetch(`/api/teams/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/teams');
+            dataMutate();
+            mutate(`/api/teams/${id}`);
             mutate('/api/rosters');
-            revalidateTag('teams');
-            revalidateTag('rosters');
+            mutate('/api/available');
         } catch (err) {
             console.error(err);
         }
     }
 
     function onClick() {
-        mutate('/api/teams');
+        setSearchVal(inputVal);
     }
 
     useEffect(() => {
-        mutate('/api/teams');
-    }, [showName, showCity, showState, mutate]);
+        dataMutate();
+    }, [showName, showCity, showState, searchVal, dataMutate]);
 
-    if (isLoading || isValidating) return <div>Loading...</div>;
+    if (error) {
+        return <div>Error</div>;
+    }
+
+    if (isLoading || !data) return <div>Loading...</div>;
 
     return (
         <>
@@ -113,10 +96,8 @@ export default function TeamDataView() {
                 <TextInput
                     label='Search by value'
                     placeholder='Lakers, Los Angeles, etc'
-                    value={searchVal}
-                    onChange={(event) =>
-                        setSearchVal(event.currentTarget.value)
-                    }
+                    value={inputVal}
+                    onChange={(event) => setInputVal(event.currentTarget.value)}
                 />
                 <Group justify='end'>
                     <Button onClick={() => onClick()} size='xs'>

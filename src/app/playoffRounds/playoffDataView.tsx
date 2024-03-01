@@ -14,67 +14,49 @@ import {
     TableTr,
     TextInput,
 } from '@mantine/core';
-import useSWR, { useSWRConfig } from 'swr';
-import { PlayoffRound } from '@/lib/types';
+import { useSWRConfig } from 'swr';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { revalidateTag } from '../actions';
+import { useAllPlayoffRounds } from '../swr';
 
 export default function PlayoffDataView() {
     const { mutate } = useSWRConfig();
     const [showName, setShowName] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
+    const [inputVal, setInputVal] = useState<string>('');
 
-    const { data, isLoading, isValidating } = useSWR<PlayoffRound[]>(
-        '/api/playoffRounds',
-        async () => {
-            let url = '/api/playoffRounds';
-            const params: string[] = [];
-            if (showName) {
-                params.push('name');
-            }
-            url += `?filter=${params.join(',')}`;
-            if (searchVal) {
-                url += `&search=${searchVal}`;
-            }
-            const res = await fetch(url);
-            if (!res.ok) {
-                const { message } = await res.json();
-                throw new Error(message);
-            }
-            return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
-        }
-    );
+    const {
+        data,
+        isLoading,
+        error,
+        mutate: dataMutate,
+    } = useAllPlayoffRounds({ showName, searchVal });
 
     async function deleteData(id: number) {
         try {
             await fetch(`/api/playoffRounds/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/playoffRounds');
+            dataMutate();
+            mutate(`/api/playoffRounds/${id}`);
             mutate('/api/rosters');
-            revalidateTag('playoffRounds');
-            revalidateTag('rosters');
+            mutate('/api/available');
         } catch (err) {
             console.error(err);
         }
     }
 
     function onClick() {
-        mutate('/api/playoffRounds');
+        setSearchVal(inputVal);
     }
 
     useEffect(() => {
-        mutate('/api/playoffRounds');
-    }, [showName, mutate]);
+        dataMutate();
+    }, [showName, searchVal, dataMutate]);
 
-    if (isLoading || isValidating) return <div>Loading...</div>;
+    if (error) return <div>Error</div>;
+
+    if (isLoading || !data) return <div>Loading...</div>;
 
     return (
         <>
@@ -91,10 +73,8 @@ export default function PlayoffDataView() {
                 <TextInput
                     label='Search by value'
                     placeholder='NBA Finals, Finals, etc'
-                    value={searchVal}
-                    onChange={(event) =>
-                        setSearchVal(event.currentTarget.value)
-                    }
+                    value={inputVal}
+                    onChange={(event) => setInputVal(event.currentTarget.value)}
                 />
                 <Group justify='end'>
                     <Button onClick={() => onClick()} size='xs'>

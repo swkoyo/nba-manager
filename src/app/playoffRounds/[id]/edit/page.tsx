@@ -1,25 +1,24 @@
-import { PlayoffRound } from '@/lib/types';
+'use client';
+
 import { Center, Space, Title } from '@mantine/core';
 import PlayoffForm from '../../playoffForm';
-import { BASE_URL } from '@/lib/constants';
+import { usePlayoffRound } from '@/app/swr';
 
-async function getData(id: number): Promise<PlayoffRound> {
-    const res = await fetch(`${BASE_URL}/api/playoffRounds/${id}`, {
-        next: { tags: ['playoffRounds'] },
-    });
-    if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message);
-    }
-    return res.json();
-}
-
-export default async function EditPlayoffRoundPage({
+export default function EditPlayoffRoundPage({
     params,
 }: {
     params: { id: number };
 }) {
-    const data = await getData(params.id);
+    const { data, error, isLoading } = usePlayoffRound(params.id);
+
+    if (error) {
+        return <div>Error</div>;
+    }
+
+    if (isLoading || !data) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <Center>

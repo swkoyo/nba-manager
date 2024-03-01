@@ -5,7 +5,7 @@ import { FullRoster, Player, PlayoffRound, Team } from '@/lib/types';
 import { Box, Button, Group, MultiSelect, Select } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
-import { redirect, revalidateTag } from '../actions';
+import { redirect } from '../actions';
 import Link from 'next/link';
 import { useSWRConfig } from 'swr';
 
@@ -117,9 +117,9 @@ export default function RosterForm({
                 await post(data);
             } else {
                 await put(data);
+                mutate(`/api/rosters/${roster.rosterID}`);
             }
             mutate('/api/rosters');
-            revalidateTag('rosters');
             redirect('/rosters');
         } catch (err) {
             console.error(err);

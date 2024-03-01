@@ -4,7 +4,7 @@ import { Player } from '@/lib/types';
 import { Box, Button, Group, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
-import { redirect, revalidateTag } from '../actions';
+import { redirect } from '../actions';
 import { useSWRConfig } from 'swr';
 
 interface Props {
@@ -55,10 +55,10 @@ export default function PlayerForm({ player }: Props) {
             } else {
                 await put(data);
                 mutate('/api/rosters');
-                revalidateTag('rosters');
+                mutate(`/api/players/${player.playerID}`);
             }
             mutate('/api/players');
-            revalidateTag('players');
+            mutate('/api/available');
             redirect('/players');
         } catch (err) {
             console.error(err);

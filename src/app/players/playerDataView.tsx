@@ -14,71 +14,50 @@ import {
     TableTr,
     TextInput,
 } from '@mantine/core';
-import useSWR, { useSWRConfig } from 'swr';
-import { Player } from '@/lib/types';
+import { useSWRConfig } from 'swr';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { revalidateTag } from '../actions';
+import { useAllPlayers } from '../swr';
 
 export default function PlayerDataView() {
     const { mutate } = useSWRConfig();
     const [showFirstName, setShowFirstName] = useState<boolean>(true);
     const [showLastName, setShowLastName] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
+    const [inputVal, setInputVal] = useState<string>('');
 
-    const { data, isLoading, isValidating } = useSWR<Player[]>(
-        '/api/players',
-        async () => {
-            let url = '/api/players';
-            const params: string[] = [];
-            if (showFirstName) {
-                params.push('firstName');
-            }
-            if (showLastName) {
-                params.push('lastName');
-            }
-            url += `?filter=${params.join(',')}`;
-            if (searchVal) {
-                url += `&search=${searchVal}`;
-            }
-            const res = await fetch(url);
-            if (!res.ok) {
-                const { message } = await res.json();
-                throw new Error(message);
-            }
-            return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
-        }
-    );
+    const {
+        data,
+        isLoading,
+        error,
+        mutate: dataMutate,
+    } = useAllPlayers({ showFirstName, showLastName, searchVal });
 
     async function deleteData(id: number) {
         try {
             await fetch(`/api/players/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/players');
+            dataMutate();
+            mutate(`/api/player/${id}`);
             mutate('/api/rosters');
-            revalidateTag('players');
-            revalidateTag('rosters');
+            mutate('/api/available');
         } catch (err) {
             console.error(err);
         }
     }
 
     function onClick() {
-        mutate('/api/players');
+        setSearchVal(inputVal);
     }
 
     useEffect(() => {
-        mutate('/api/players');
-    }, [showFirstName, showLastName, mutate]);
+        dataMutate();
+    }, [showFirstName, showLastName, searchVal, dataMutate]);
 
-    if (isLoading || isValidating) return <div>Loading...</div>;
+    if (error) return <div>Error</div>;
+
+    if (isLoading || !data) return <div>Loading...</div>;
 
     return (
         <>
@@ -102,10 +81,8 @@ export default function PlayerDataView() {
                 <TextInput
                     label='Search by value'
                     placeholder='LeBron, Jordan, etc'
-                    value={searchVal}
-                    onChange={(event) =>
-                        setSearchVal(event.currentTarget.value)
-                    }
+                    value={inputVal}
+                    onChange={(event) => setInputVal(event.currentTarget.value)}
                 />
                 <Group justify='end'>
                     <Button onClick={() => onClick()} size='xs'>
@@ -123,7 +100,7 @@ export default function PlayerDataView() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data?.map((player) => (
+                    {data.map((player) => (
                         <TableTr key={player.playerID}>
                             <TableTd>{player.playerID}</TableTd>
                             {showFirstName && (

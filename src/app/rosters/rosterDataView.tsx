@@ -14,11 +14,10 @@ import {
     TableTr,
     TextInput,
 } from '@mantine/core';
-import useSWR, { useSWRConfig } from 'swr';
-import { FullRoster } from '@/lib/types';
+import { useSWRConfig } from 'swr';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { revalidateTag } from '../actions';
+import { useAllRosters } from '../swr';
 
 export default function RosterDataView() {
     const { mutate } = useSWRConfig();
@@ -27,64 +26,51 @@ export default function RosterDataView() {
     const [showPlayoffRound, setShowPlayoffRound] = useState<boolean>(true);
     const [showPlayers, setShowPlayers] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
+    const [inputVal, setInputVal] = useState<string>('');
 
-    const { data, isLoading, isValidating } = useSWR<FullRoster[]>(
-        '/api/rosters',
-        async () => {
-            let url = '/api/rosters';
-            const params: string[] = [];
-            if (showYear) {
-                params.push('year');
-            }
-            if (showTeam) {
-                params.push('team');
-            }
-            if (showPlayoffRound) {
-                params.push('playoffRound');
-            }
-            if (showPlayers) {
-                params.push('players');
-            }
-            url += `?filter=${params.join(',')}`;
-            if (searchVal) {
-                url += `&search=${searchVal}`;
-            }
-            const res = await fetch(url);
-            if (!res.ok) {
-                const { message } = await res.json();
-                throw new Error(message);
-            }
-            return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
-        }
-    );
+    const {
+        data,
+        isLoading,
+        error,
+        mutate: dataMutate,
+    } = useAllRosters({
+        showYear,
+        showTeam,
+        showPlayoffRound,
+        showPlayers,
+        searchVal,
+    });
 
     async function deleteData(id: number) {
         try {
             await fetch(`/api/rosters/${id}`, {
                 method: 'DELETE',
             });
-            mutate('/api/rosters');
-            revalidateTag('rosters');
+            dataMutate();
+            mutate(`/api/rosters/${id}`);
         } catch (err) {
             console.error(err);
         }
     }
 
     function onClick() {
-        mutate('/api/rosters');
+        setSearchVal(inputVal);
     }
 
     useEffect(() => {
-        mutate('/api/rosters');
-    }, [showPlayers, showPlayoffRound, showTeam, showYear, mutate]);
+        dataMutate();
+    }, [
+        showPlayers,
+        showPlayoffRound,
+        showTeam,
+        showYear,
+        searchVal,
+        dataMutate,
+    ]);
 
-    if (isLoading || isValidating) return <div>Loading...</div>;
+    if (error) return <div>Error</div>;
+
+    if (isLoading || !data) return <div>Loading...</div>;
 
     return (
         <>
@@ -122,10 +108,8 @@ export default function RosterDataView() {
                 <TextInput
                     label='Search by value'
                     placeholder='Lakers, Lebron, 2024, etc'
-                    value={searchVal}
-                    onChange={(event) =>
-                        setSearchVal(event.currentTarget.value)
-                    }
+                    value={inputVal}
+                    onChange={(event) => setInputVal(event.currentTarget.value)}
                 />
                 <Group justify='end'>
                     <Button onClick={() => onClick()} size='xs'>

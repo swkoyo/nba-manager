@@ -1,33 +1,29 @@
-import { AvailableData, FullRoster } from '@/lib/types';
+'use client';
+
 import { Center, Space, Title } from '@mantine/core';
 import RosterForm from '../../rosterForm';
-import { BASE_URL } from '@/lib/constants';
+import { useAvailable, useRoster } from '@/app/swr';
 
-async function getData(
-    id: number
-): Promise<{ roster: FullRoster; available: AvailableData }> {
-    const res = await fetch(`${BASE_URL}/api/rosters/${id}`, {
-        next: { tags: ['rosters'] },
-    });
-    if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message);
+export default function EditRosterPage({ params }: { params: { id: number } }) {
+    const {
+        data: roster,
+        isLoading: rosterIsLoading,
+        error: rosterError,
+    } = useRoster(params.id);
+    const {
+        data: available,
+        isLoading: availableIsLoading,
+        error: availableError,
+    } = useAvailable();
+
+    if (rosterError || availableError) {
+        return <div>Error</div>;
     }
-    const availableRes = await fetch(`${BASE_URL}/api/available`, {
-        next: { tags: ['teams', 'players', 'playoffRounds'] },
-    });
-    return {
-        roster: await res.json(),
-        available: await availableRes.json(),
-    };
-}
 
-export default async function EditRosterPage({
-    params,
-}: {
-    params: { id: number };
-}) {
-    const { roster, available } = await getData(params.id);
+    if (rosterIsLoading || availableIsLoading || !roster || !available) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <Center>
