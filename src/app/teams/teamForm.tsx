@@ -2,13 +2,15 @@
 
 import { STATES } from '@/lib/constants';
 import { Team } from '@/lib/types';
-import { Box, Button, Group, Select, TextInput } from '@mantine/core';
+import { Alert, Box, Button, Group, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { z } from 'zod';
 import { zodResolver } from '@mantine/form';
 import { redirect } from '../actions';
 import Link from 'next/link';
 import { useSWRConfig } from 'swr';
+import { useState } from 'react';
+import { poster, putter } from '../fetcher';
 
 const schema = z.object({
     name: z
@@ -33,6 +35,8 @@ interface Props {
 
 export default function TeamForm({ team }: Props) {
     const { mutate } = useSWRConfig();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const form = useForm({
         initialValues: {
             name: team?.name || '',
@@ -42,26 +46,23 @@ export default function TeamForm({ team }: Props) {
         validate: zodResolver(schema),
     });
 
-    async function post(data: Schema) {
-        return fetch('/api/teams', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+    function post(data: Schema) {
+        return poster('/api/teams', data);
     }
 
-    async function put(data: Schema) {
-        return fetch(`/api/teams/${team?.teamID}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        });
+    function put(data: Schema) {
+        return putter(`/api/teams/${team?.teamID}`, data);
     }
 
     async function handleSubmit(data: Schema) {
         try {
+            setIsLoading(true);
             if (!team) {
                 await post(data);
+                setIsLoading(false);
             } else {
                 await put(data);
+                setIsLoading(false);
                 mutate('/api/rosters');
                 mutate(`/api/teams/${team.teamID}`);
             }
@@ -69,12 +70,23 @@ export default function TeamForm({ team }: Props) {
             mutate('/api/available');
             redirect('/teams');
         } catch (err) {
-            console.error(err);
+            form.reset();
+            setIsLoading(false);
+            setError((err as any).message);
         }
     }
 
     return (
         <Box mx='auto'>
+            {error && (
+                <Alert
+                    withCloseButton
+                    onClose={() => setError(null)}
+                    color='red'
+                >
+                    {error}
+                </Alert>
+            )}
             <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
                 <TextInput
                     withAsterisk
@@ -99,7 +111,9 @@ export default function TeamForm({ team }: Props) {
                     <Button component={Link} href='/teams'>
                         Cancel
                     </Button>
-                    <Button type='submit'>Apply</Button>
+                    <Button loading={isLoading} type='submit'>
+                        Apply
+                    </Button>
                 </Group>
             </form>
         </Box>

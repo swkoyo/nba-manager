@@ -1,8 +1,5 @@
-import type { Metadata } from 'next';
-// import { Inter } from 'next/font/google';
-// import './globals.css';
 import '@mantine/core/styles.css';
-
+import type { Metadata } from 'next';
 import {
     AppShell,
     AppShellHeader,
@@ -13,8 +10,6 @@ import {
 } from '@mantine/core';
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
 import Link from 'next/link';
-
-// const inter = Inter({ subsets: ['latin'] });
 
 const theme = createTheme({
     fontFamily: 'Open Sans, sans-serif',
@@ -36,7 +31,6 @@ export default function RootLayout({
             <head>
                 <ColorSchemeScript />
             </head>
-            {/* <body className={inter.className}> */}
             <body>
                 <MantineProvider defaultColorScheme='dark' theme={theme}>
                     <AppShell
@@ -44,15 +38,41 @@ export default function RootLayout({
                         navbar={{ width: 300, breakpoint: 'sm' }}
                         padding='md'
                     >
-                        <AppShellHeader p="md">
+                        <AppShellHeader p='md'>
                             <div>NBA MANAGER</div>
                         </AppShellHeader>
-                        <AppShellNavbar p="md">
-                            <Button variant="subtle" component={Link} href="/">Home</Button>
-                            <Button variant="subtle" component={Link} href="/rosters">Rosters</Button>
-                            <Button variant="subtle" component={Link} href="/players">Players</Button>
-                            <Button variant="subtle" component={Link} href="/teams">Teams</Button>
-                            <Button variant="subtle" component={Link} href="/playoffRounds">Playoff Rounds</Button>
+                        <AppShellNavbar p='md'>
+                            <Button variant='subtle' component={Link} href='/'>
+                                Home
+                            </Button>
+                            <Button
+                                variant='subtle'
+                                component={Link}
+                                href='/rosters'
+                            >
+                                Rosters
+                            </Button>
+                            <Button
+                                variant='subtle'
+                                component={Link}
+                                href='/players'
+                            >
+                                Players
+                            </Button>
+                            <Button
+                                variant='subtle'
+                                component={Link}
+                                href='/teams'
+                            >
+                                Teams
+                            </Button>
+                            <Button
+                                variant='subtle'
+                                component={Link}
+                                href='/playoffRounds'
+                            >
+                                Playoff Rounds
+                            </Button>
                         </AppShellNavbar>
                         <AppShellMain>
                             <Container>{children}</Container>

@@ -1,12 +1,14 @@
 'use client';
 
 import { PlayoffRound } from '@/lib/types';
-import { Box, Button, Group, TextInput } from '@mantine/core';
+import { Alert, Box, Button, Group, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import Link from 'next/link';
 import { z } from 'zod';
 import { redirect } from '../actions';
 import { useSWRConfig } from 'swr';
+import { useState } from 'react';
+import { poster, putter } from '../fetcher';
 
 const schema = z.object({
     name: z
@@ -23,6 +25,8 @@ export default function PlayoffForm({
     playoffRound?: PlayoffRound;
 }) {
     const { mutate } = useSWRConfig();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const form = useForm({
         initialValues: {
             name: playoffRound?.name || '',
@@ -30,26 +34,26 @@ export default function PlayoffForm({
         validate: zodResolver(schema),
     });
 
-    async function post(data: Schema) {
-        return fetch('/api/playoffRounds', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+    function post(data: Schema) {
+        return poster('/api/playoffRounds', data);
     }
 
-    async function put(data: Schema) {
-        return fetch(`/api/playoffRounds/${playoffRound?.playoffRoundID}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        });
+    function put(data: Schema) {
+        return putter(
+            `/api/playoffRounds/${playoffRound?.playoffRoundID}`,
+            data
+        );
     }
 
     async function handleSubmit(data: Schema) {
         try {
+            setIsLoading(true);
             if (!playoffRound) {
                 await post(data);
+                setIsLoading(false);
             } else {
                 await put(data);
+                setIsLoading(false);
                 mutate('/api/rosters');
                 mutate(`/api/playoffRounds/${playoffRound.playoffRoundID}`);
             }
@@ -57,12 +61,22 @@ export default function PlayoffForm({
             mutate('/api/available');
             redirect('/playoffRounds');
         } catch (err) {
-            console.error(err);
+            setIsLoading(false);
+            setError((err as any).message);
         }
     }
 
     return (
         <Box mx='auto'>
+            {error && (
+                <Alert
+                    withCloseButton
+                    onClose={() => setError(null)}
+                    color='red'
+                >
+                    {error}
+                </Alert>
+            )}
             <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
                 <TextInput
                     withAsterisk
@@ -74,7 +88,9 @@ export default function PlayoffForm({
                     <Button component={Link} href='/playoffRounds'>
                         Cancel
                     </Button>
-                    <Button type='submit'>Apply</Button>
+                    <Button loading={isLoading} type='submit'>
+                        Apply
+                    </Button>
                 </Group>
             </form>
         </Box>

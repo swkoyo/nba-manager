@@ -1,6 +1,6 @@
 'use client';
 
-import { Center, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader, Space, Title } from '@mantine/core';
 import PlayoffForm from '../../playoffForm';
 import { usePlayoffRound } from '@/app/swr';
 
@@ -12,11 +12,21 @@ export default function EditPlayoffRoundPage({
     const { data, error, isLoading } = usePlayoffRound(params.id);
 
     if (error) {
-        return <div>Error</div>;
+        return (
+            <Center>
+                <Alert color='red' title='Error'>
+                    An error occured while retrieving data: {error.message}
+                </Alert>
+            </Center>
+        );
     }
 
     if (isLoading || !data) {
-        return <div>Loading...</div>;
+        return (
+            <Center>
+                <Loader />
+            </Center>
+        );
     }
 
     return (

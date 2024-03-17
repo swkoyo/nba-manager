@@ -1,11 +1,14 @@
 'use client';
 
 import { Player } from '@/lib/types';
-import { Box, Button, Group, TextInput } from '@mantine/core';
+import { Alert, Box, Button, Group, TextInput } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 import { redirect } from '../actions';
 import { useSWRConfig } from 'swr';
+import { useState } from 'react';
+import { poster, putter } from '../fetcher';
+import Link from 'next/link';
 
 interface Props {
     player?: Player;
@@ -26,6 +29,8 @@ type Schema = z.infer<typeof schema>;
 
 export default function PlayerForm({ player }: Props) {
     const { mutate } = useSWRConfig();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const form = useForm({
         initialValues: {
             firstName: player?.firstName || '',
@@ -34,26 +39,23 @@ export default function PlayerForm({ player }: Props) {
         validate: zodResolver(schema),
     });
 
-    async function post(data: Schema) {
-        return fetch('/api/players', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
+    function post(data: Schema) {
+        return poster('/api/players', data);
     }
 
-    async function put(data: Schema) {
-        return fetch(`/api/players/${player?.playerID}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        });
+    function put(data: Schema) {
+        return putter(`/api/players/${player?.playerID}`, data);
     }
 
     async function handleSubmit(data: Schema) {
+        setIsLoading(true);
         try {
             if (!player) {
                 await post(data);
+                setIsLoading(false);
             } else {
                 await put(data);
+                setIsLoading(false);
                 mutate('/api/rosters');
                 mutate(`/api/players/${player.playerID}`);
             }
@@ -61,12 +63,22 @@ export default function PlayerForm({ player }: Props) {
             mutate('/api/available');
             redirect('/players');
         } catch (err) {
-            console.error(err);
+            setIsLoading(false);
+            setError((err as any).message);
         }
     }
 
     return (
         <Box mx='auto'>
+            {error && (
+                <Alert
+                    withCloseButton
+                    onClose={() => setError(null)}
+                    color='red'
+                >
+                    {error}
+                </Alert>
+            )}
             <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
                 <TextInput
                     withAsterisk
@@ -81,7 +93,12 @@ export default function PlayerForm({ player }: Props) {
                     {...form.getInputProps('lastName')}
                 />
                 <Group justify='flex-end' mt='md'>
-                    <Button type='submit'>Apply</Button>
+                    <Button component={Link} href='/players'>
+                        Cancel
+                    </Button>
+                    <Button loading={isLoading} type='submit'>
+                        Apply
+                    </Button>
                 </Group>
             </form>
         </Box>

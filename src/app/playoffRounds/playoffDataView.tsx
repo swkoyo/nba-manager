@@ -1,9 +1,12 @@
 'use client';
 
 import {
+    Alert,
     Button,
+    Center,
     Flex,
     Group,
+    Loader,
     Stack,
     Switch,
     Table,
@@ -18,12 +21,15 @@ import { useSWRConfig } from 'swr';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAllPlayoffRounds } from '../swr';
+import { deleter } from '../fetcher';
 
 export default function PlayoffDataView() {
     const { mutate } = useSWRConfig();
     const [showName, setShowName] = useState<boolean>(true);
     const [searchVal, setSearchVal] = useState<string>('');
     const [inputVal, setInputVal] = useState<string>('');
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const {
         data,
@@ -34,15 +40,16 @@ export default function PlayoffDataView() {
 
     async function deleteData(id: number) {
         try {
-            await fetch(`/api/playoffRounds/${id}`, {
-                method: 'DELETE',
-            });
+            setDeletingId(id);
+            await deleter(`/api/playoffRounds/${id}`);
+            setDeletingId(null);
             dataMutate();
             mutate(`/api/playoffRounds/${id}`);
             mutate('/api/rosters');
             mutate('/api/available');
         } catch (err) {
-            console.error(err);
+            setDeletingId(null);
+            setDeleteError((err as any).message);
         }
     }
 
@@ -54,12 +61,36 @@ export default function PlayoffDataView() {
         dataMutate();
     }, [showName, searchVal, dataMutate]);
 
-    if (error) return <div>Error</div>;
+    if (error) {
+        return (
+            <Center>
+                <Alert color='red'>
+                    An error occured while retrieving data: {error.message}
+                </Alert>
+            </Center>
+        );
+    }
 
-    if (isLoading || !data) return <div>Loading...</div>;
+    if (isLoading || !data) {
+        return (
+            <Center>
+                <Loader />
+            </Center>
+        );
+    }
 
     return (
         <>
+            {deleteError && (
+                <Alert
+                    withCloseButton
+                    w='100%'
+                    onClose={() => setDeleteError(null)}
+                    color='red'
+                >
+                    {deleteError}
+                </Alert>
+            )}
             <Flex w='100%' justify='space-evenly'>
                 <Switch
                     checked={showName}
@@ -109,6 +140,7 @@ export default function PlayoffDataView() {
                                     onClick={() =>
                                         deleteData(playoffRound.playoffRoundID)
                                     }
+                                    loading={deletingId === playoffRound.playoffRoundID}
                                     size='xs'
                                     radius='xl'
                                     color='red'

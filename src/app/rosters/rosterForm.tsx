@@ -2,12 +2,14 @@
 
 import { YEARS } from '@/lib/constants';
 import { FullRoster, Player, PlayoffRound, Team } from '@/lib/types';
-import { Box, Button, Group, MultiSelect, Select } from '@mantine/core';
+import { Alert, Box, Button, Group, MultiSelect, Select } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 import { redirect } from '../actions';
 import Link from 'next/link';
 import { useSWRConfig } from 'swr';
+import { useState } from 'react';
+import { poster, putter } from '../fetcher';
 
 interface Props {
     roster?: FullRoster;
@@ -23,6 +25,8 @@ export default function RosterForm({
     playoffRounds,
 }: Props) {
     const { mutate } = useSWRConfig();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const schema = z.object({
         year: z
             .string()
@@ -84,46 +88,44 @@ export default function RosterForm({
         validate: zodResolver(schema),
     });
 
-    async function post(data: Schema) {
-        return fetch('/api/rosters', {
-            method: 'POST',
-            body: JSON.stringify({
-                year: data.year,
-                teamID: parseInt(data.team),
-                playoffRoundID: data.playoffRound
-                    ? parseInt(data.playoffRound)
-                    : null,
-                playerIDs: data.players.map((p) => parseInt(p)),
-            }),
+    function post(data: Schema) {
+        return poster('/api/rosters', {
+            year: data.year,
+            teamID: parseInt(data.team),
+            playoffRoundID: data.playoffRound
+                ? parseInt(data.playoffRound)
+                : null,
+            playerIDs: data.players.map((p) => parseInt(p)),
         });
     }
 
-    async function put(data: Schema) {
-        return fetch(`/api/rosters/${roster?.rosterID}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                year: data.year,
-                teamID: parseInt(data.team),
-                playoffRoundID: data.playoffRound
-                    ? parseInt(data.playoffRound)
-                    : null,
-                playerIDs: data.players.map((p) => parseInt(p)),
-            }),
+    function put(data: Schema) {
+        return putter(`/api/rosters/${roster?.rosterID}`, {
+            year: data.year,
+            teamID: parseInt(data.team),
+            playoffRoundID: data.playoffRound
+                ? parseInt(data.playoffRound)
+                : null,
+            playerIDs: data.players.map((p) => parseInt(p)),
         });
     }
 
     async function handleSubmit(data: Schema) {
+        setIsLoading(true);
         try {
             if (!roster) {
                 await post(data);
+                setIsLoading(false);
             } else {
                 await put(data);
+                setIsLoading(false);
                 mutate(`/api/rosters/${roster.rosterID}`);
             }
             mutate('/api/rosters');
             redirect('/rosters');
         } catch (err) {
-            console.error(err);
+            setIsLoading(false);
+            setError((err as any).message);
         }
     }
 
@@ -147,6 +149,15 @@ export default function RosterForm({
 
     return (
         <Box mx='auto'>
+            {error && (
+                <Alert
+                    withCloseButton
+                    onClose={() => setError(null)}
+                    color='red'
+                >
+                    {error}
+                </Alert>
+            )}
             <form
                 onSubmit={form.onSubmit((values) =>
                     handleSubmit(values as unknown as Schema)

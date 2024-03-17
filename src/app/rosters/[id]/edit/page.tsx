@@ -1,6 +1,6 @@
 'use client';
 
-import { Center, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader, Space, Title } from '@mantine/core';
 import RosterForm from '../../rosterForm';
 import { useAvailable, useRoster } from '@/app/swr';
 
@@ -17,11 +17,22 @@ export default function EditRosterPage({ params }: { params: { id: number } }) {
     } = useAvailable();
 
     if (rosterError || availableError) {
-        return <div>Error</div>;
+        return (
+            <Center>
+                <Alert color='red' title='Error'>
+                    An error occured while retrieving data:{' '}
+                    {rosterError ? rosterError.message : availableError.message}
+                </Alert>
+            </Center>
+        );
     }
 
     if (rosterIsLoading || availableIsLoading || !roster || !available) {
-        return <div>Loading...</div>;
+        return (
+            <Center>
+                <Loader />
+            </Center>
+        );
     }
 
     return (
