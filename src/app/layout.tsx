@@ -10,6 +10,7 @@ import {
 } from '@mantine/core';
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
 import Link from 'next/link';
+import Navbar from './components/Navbar';
 
 const theme = createTheme({
     fontFamily: 'Open Sans, sans-serif',
@@ -41,39 +42,7 @@ export default function RootLayout({
                         <AppShellHeader p='md'>
                             <div>NBA MANAGER</div>
                         </AppShellHeader>
-                        <AppShellNavbar p='md'>
-                            <Button variant='subtle' component={Link} href='/'>
-                                Home
-                            </Button>
-                            <Button
-                                variant='subtle'
-                                component={Link}
-                                href='/rosters'
-                            >
-                                Rosters
-                            </Button>
-                            <Button
-                                variant='subtle'
-                                component={Link}
-                                href='/players'
-                            >
-                                Players
-                            </Button>
-                            <Button
-                                variant='subtle'
-                                component={Link}
-                                href='/teams'
-                            >
-                                Teams
-                            </Button>
-                            <Button
-                                variant='subtle'
-                                component={Link}
-                                href='/playoffRounds'
-                            >
-                                Playoff Rounds
-                            </Button>
-                        </AppShellNavbar>
+                        <Navbar />
                         <AppShellMain>
                             <Container>{children}</Container>
                         </AppShellMain>
