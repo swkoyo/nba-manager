@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Center, Loader, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader } from '@mantine/core';
 import RosterForm from '../../rosterForm';
 import { useAvailable, useRoster } from '@/app/swr';
 
@@ -36,17 +36,11 @@ export default function EditRosterPage({ params }: { params: { id: number } }) {
     }
 
     return (
-        <>
-            <Center>
-                <Title order={2}>Edit Roster</Title>
-            </Center>
-            <Space h='md' />
-            <RosterForm
-                roster={roster}
-                teams={available.teams}
-                players={available.players}
-                playoffRounds={available.playoffRounds}
-            />
-        </>
+        <RosterForm
+            roster={roster}
+            teams={available.teams}
+            players={available.players}
+            playoffRounds={available.playoffRounds}
+        />
     );
 }

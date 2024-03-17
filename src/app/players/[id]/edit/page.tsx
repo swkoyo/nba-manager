@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Center, Loader, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader } from '@mantine/core';
 import PlayerForm from '../../playerForm';
 import { usePlayer } from '@/app/swr';
 
@@ -25,13 +25,5 @@ export default function EditPlayerPage({ params }: { params: { id: number } }) {
         );
     }
 
-    return (
-        <>
-            <Center>
-                <Title order={2}>Edit Player</Title>
-            </Center>
-            <Space h='md' />
-            <PlayerForm player={data} />
-        </>
-    );
+    return <PlayerForm player={data} />;
 }

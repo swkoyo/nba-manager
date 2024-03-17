@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Center, Loader, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader } from '@mantine/core';
 import PlayoffForm from '../../playoffForm';
 import { usePlayoffRound } from '@/app/swr';
 
@@ -29,13 +29,5 @@ export default function EditPlayoffRoundPage({
         );
     }
 
-    return (
-        <>
-            <Center>
-                <Title order={2}>Edit Playoff Round</Title>
-            </Center>
-            <Space h='md' />
-            <PlayoffForm playoffRound={data} />
-        </>
-    );
+    return <PlayoffForm playoffRound={data} />;
 }

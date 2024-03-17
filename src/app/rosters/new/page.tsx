@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Center, Loader, Space, Title } from '@mantine/core';
+import { Alert, Center, Loader } from '@mantine/core';
 import RosterForm from '../rosterForm';
 import { useAvailable } from '@/app/swr';
 
@@ -26,16 +26,10 @@ export default function AddNewRoster() {
     }
 
     return (
-        <>
-            <Center>
-                <Title order={2}>Add New Roster</Title>
-            </Center>
-            <Space h='md' />
-            <RosterForm
-                players={data.players}
-                teams={data.teams}
-                playoffRounds={data.playoffRounds}
-            />
-        </>
+        <RosterForm
+            players={data.players}
+            teams={data.teams}
+            playoffRounds={data.playoffRounds}
+        />
     );
 }
