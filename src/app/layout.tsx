@@ -3,14 +3,14 @@ import type { Metadata } from 'next';
 import {
     AppShell,
     AppShellHeader,
-    AppShellNavbar,
     AppShellMain,
     Container,
-    Button,
+    Flex,
+    Title,
 } from '@mantine/core';
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
-import Link from 'next/link';
 import Navbar from './components/Navbar';
+import { IconBallBasketball } from '@tabler/icons-react';
 
 const theme = createTheme({
     fontFamily: 'Open Sans, sans-serif',
@@ -40,7 +40,12 @@ export default function RootLayout({
                         padding='md'
                     >
                         <AppShellHeader p='md'>
-                            <div>NBA MANAGER</div>
+                            <Flex align='center'>
+                                <IconBallBasketball />
+                                <Title ml='xs' order={4}>
+                                    NBA Manager
+                                </Title>
+                            </Flex>
                         </AppShellHeader>
                         <Navbar />
                         <AppShellMain>

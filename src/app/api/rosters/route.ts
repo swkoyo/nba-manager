@@ -76,7 +76,9 @@ export async function POST(request: Request) {
             throw new Error(`Playoff Round ${playoffRoundID} not found`);
         }
         if (await isExistingRoster(teamID, year)) {
-            throw new Error('Roster already exists');
+            throw new Error(
+                `Roster for team ${teamID} already exists for year ${year}`
+            );
         }
         const playerIDRes = await turso.execute(
             `SELECT COUNT(*) FROM Players WHERE playerID IN (${playerIDs.join(
@@ -87,7 +89,9 @@ export async function POST(request: Request) {
             throw new Error('Some players not found');
         }
         if (await areExistingRosterPlayers(year, playerIDs)) {
-            throw new Error('Players are already in rosters during this year');
+            throw new Error(
+                'Some players are already in a roster for this year'
+            );
         }
 
         const transaction = await turso.transaction('write');

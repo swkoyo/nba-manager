@@ -65,7 +65,9 @@ export async function PUT(
             throw new Error(`Playoff Round ${playoffRoundID} not found`);
         }
         if (await isExistingRoster(teamID, year, params.id)) {
-            throw new Error('Roster already exists');
+            throw new Error(
+                `Roster for team ${teamID} already exists during year ${year}`
+            );
         }
 
         const playerIDRes = await turso.execute(
@@ -77,7 +79,9 @@ export async function PUT(
             throw new Error('Some players not found');
         }
         if (await areExistingRosterPlayers(year, playerIDs, params.id)) {
-            throw new Error('Players are already in rosters during this year');
+            throw new Error(
+                'Some players already exist in another roster for this year'
+            );
         }
 
         const existingPlayerIDRes = await turso.execute({
@@ -85,7 +89,9 @@ export async function PUT(
             args: [params.id],
         });
 
-        const existingPlayerIDs = existingPlayerIDRes.rows.map((r) => r.playerID)
+        const existingPlayerIDs = existingPlayerIDRes.rows.map(
+            (r) => r.playerID
+        );
         const newPlayerIDs: number[] = [];
         const removedPlayerIDs: number[] = [];
 
