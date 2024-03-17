@@ -28,7 +28,7 @@ export default function AddNewRoster() {
     return (
         <>
             <Center>
-                <Title order={1}>Add New Roster</Title>
+                <Title order={2}>Add New Roster</Title>
             </Center>
             <Space h='md' />
             <RosterForm

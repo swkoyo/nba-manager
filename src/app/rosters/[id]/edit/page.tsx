@@ -38,7 +38,7 @@ export default function EditRosterPage({ params }: { params: { id: number } }) {
     return (
         <>
             <Center>
-                <Title order={1}>Edit Roster</Title>
+                <Title order={2}>Edit Roster</Title>
             </Center>
             <Space h='md' />
             <RosterForm

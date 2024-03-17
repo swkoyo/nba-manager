@@ -32,7 +32,7 @@ export default function EditPlayoffRoundPage({
     return (
         <>
             <Center>
-                <Title order={1}>Edit Playoff Round</Title>
+                <Title order={2}>Edit Playoff Round</Title>
             </Center>
             <Space h='md' />
             <PlayoffForm playoffRound={data} />

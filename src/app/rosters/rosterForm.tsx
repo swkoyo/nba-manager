@@ -199,7 +199,9 @@ export default function RosterForm({
                     <Button component={Link} href='/rosters'>
                         Cancel
                     </Button>
-                    <Button loading={isLoading} type='submit'>Apply</Button>
+                    <Button loading={isLoading} type='submit'>
+                        Apply
+                    </Button>
                 </Group>
             </form>
         </Box>

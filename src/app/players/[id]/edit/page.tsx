@@ -28,7 +28,7 @@ export default function EditPlayerPage({ params }: { params: { id: number } }) {
     return (
         <>
             <Center>
-                <Title order={1}>Edit Player</Title>
+                <Title order={2}>Edit Player</Title>
             </Center>
             <Space h='md' />
             <PlayerForm player={data} />

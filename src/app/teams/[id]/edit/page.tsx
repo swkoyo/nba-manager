@@ -28,7 +28,7 @@ export default function EditTeamPage({ params }: { params: { id: number } }) {
     return (
         <>
             <Center>
-                <Title order={1}>Edit Team</Title>
+                <Title order={2}>Edit Team</Title>
             </Center>
             <Space h='md' />
             <TeamForm team={data} />
