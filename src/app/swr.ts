@@ -8,6 +8,13 @@ import {
     Team,
 } from '@/lib/types';
 
+// NOTE: Citation
+// Date: 03/18/2024
+// All functions on this page are based on the documentation for the SWR library.
+// This library is a React Hooks library for remote data fetching.
+// These functions allow me to fetch data from a reusable hook and cache results.
+// Source: https://swr.vercel.app/docs/data-fetching
+
 export function useAllTeams({
     showName,
     showCity,

@@ -1,3 +1,10 @@
+// NOTE: Citation
+// Date: 03/18/2024
+// All functions on this page are based on the documentation for the SWR library.
+// These functions abstract the use of the fetch package
+// The main reason for these abstractions is to standardize error handling and return types when fetching data
+// Source: https://swr.vercel.app/docs/data-fetching
+
 export async function fetcher(url: string) {
     const res = await fetch(url);
     if (!res.ok) {

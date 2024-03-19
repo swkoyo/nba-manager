@@ -12,8 +12,7 @@ export default function NavbarItem({
     label: string;
 }) {
     const pathname = usePathname();
-    const isActive =
-        href === '/' ? pathname === '/' : pathname.includes(href);
+    const isActive = href === '/' ? pathname === '/' : pathname.includes(href);
     return (
         <Button
             variant={isActive ? 'filled' : 'subtle'}

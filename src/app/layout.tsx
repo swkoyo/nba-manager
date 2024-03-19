@@ -22,6 +22,16 @@ export const metadata: Metadata = {
     description: 'An app that lets you keep track of NBA teams',
 };
 
+// NOTE: Citation
+// Date: 03/17/2024
+// The following code is based on the Mantine documentation and Next.js documentation
+// RootLayout is a component that wraps the entire application. It provides a consistent layout for all pages.
+// MantineProvider is a component that provides the Mantine theme and color scheme to the entire application.
+// AppShellHeader is a component that provides a header section for the application.
+// AppMain is a component that provides the main content area for the application.
+// Next.js Source URL: https://nextjs.org/docs/getting-started/installation
+// Mantine Source URL: https://mantine.dev/docs/getting-started/
+
 export default function RootLayout({
     children,
 }: Readonly<{
