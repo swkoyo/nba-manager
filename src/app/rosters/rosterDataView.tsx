@@ -51,9 +51,9 @@ export default function RosterDataView() {
         try {
             setDeletingId(id);
             await deleter(`/api/rosters/${id}`);
-            setDeletingId(null);
             dataMutate();
-            mutate(`/api/rosters/${id}`);
+            mutate(`/api/rosters/${id}`, true);
+            setDeletingId(null);
         } catch (err) {
             setDeletingId(null);
             setDeleteError((err as any).message);

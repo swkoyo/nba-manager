@@ -42,11 +42,11 @@ export default function PlayoffDataView() {
         try {
             setDeletingId(id);
             await deleter(`/api/playoffRounds/${id}`);
-            setDeletingId(null);
             dataMutate();
-            mutate(`/api/playoffRounds/${id}`);
-            mutate('/api/rosters');
-            mutate('/api/available');
+            mutate(`/api/playoffRounds/${id}`, true);
+            mutate('/api/rosters', true);
+            mutate('/api/available', true);
+            setDeletingId(null);
         } catch (err) {
             setDeletingId(null);
             setDeleteError((err as any).message);

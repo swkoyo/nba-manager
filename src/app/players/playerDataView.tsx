@@ -43,11 +43,11 @@ export default function PlayerDataView() {
         try {
             setDeletingId(id);
             await deleter(`/api/players/${id}`);
-            setDeletingId(null);
             dataMutate();
-            mutate(`/api/player/${id}`);
-            mutate('/api/rosters');
-            mutate('/api/available');
+            mutate(`/api/player/${id}`, true);
+            mutate('/api/rosters', true);
+            mutate('/api/available', true);
+            setDeletingId(null);
         } catch (err) {
             setDeletingId(null);
             setDeleteError((err as any).message);

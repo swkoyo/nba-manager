@@ -52,15 +52,14 @@ export default function PlayerForm({ player }: Props) {
         try {
             if (!player) {
                 await post(data);
-                setIsLoading(false);
             } else {
                 await put(data);
-                setIsLoading(false);
-                mutate('/api/rosters');
-                mutate(`/api/players/${player.playerID}`);
+                mutate('/api/rosters', true);
+                mutate(`/api/players/${player.playerID}`, true);
             }
-            mutate('/api/players');
-            mutate('/api/available');
+            mutate('/api/players', true);
+            mutate('/api/available', true);
+            setIsLoading(false);
             redirect('/players');
         } catch (err) {
             setIsLoading(false);

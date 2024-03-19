@@ -59,18 +59,16 @@ export default function TeamForm({ team }: Props) {
             setIsLoading(true);
             if (!team) {
                 await post(data);
-                setIsLoading(false);
             } else {
                 await put(data);
-                setIsLoading(false);
-                mutate('/api/rosters');
-                mutate(`/api/teams/${team.teamID}`);
+                mutate('/api/rosters', true);
+                mutate(`/api/teams/${team.teamID}`, true);
             }
-            mutate('/api/teams');
-            mutate('/api/available');
+            mutate('/api/teams', true);
+            mutate('/api/available', true);
+            setIsLoading(false);
             redirect('/teams');
         } catch (err) {
-            form.reset();
             setIsLoading(false);
             setError((err as any).message);
         }

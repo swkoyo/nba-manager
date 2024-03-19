@@ -115,13 +115,12 @@ export default function RosterForm({
         try {
             if (!roster) {
                 await post(data);
-                setIsLoading(false);
             } else {
                 await put(data);
-                setIsLoading(false);
-                mutate(`/api/rosters/${roster.rosterID}`);
+                mutate(`/api/rosters/${roster.rosterID}`, true);
             }
-            mutate('/api/rosters');
+            mutate('/api/rosters', true);
+            setIsLoading(false);
             redirect('/rosters');
         } catch (err) {
             setIsLoading(false);
