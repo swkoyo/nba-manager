@@ -61,11 +61,11 @@ export default function TeamForm({ team }: Props) {
                 await post(data);
             } else {
                 await put(data);
-                mutate('/api/rosters', true);
-                mutate(`/api/teams/${team.teamID}`, true);
+                mutate('/api/rosters');
+                mutate(`/api/teams/${team.teamID}`);
             }
-            mutate('/api/teams', true);
-            mutate('/api/available', true);
+            mutate('/api/teams');
+            mutate('/api/available');
             setIsLoading(false);
             redirect('/teams');
         } catch (err) {

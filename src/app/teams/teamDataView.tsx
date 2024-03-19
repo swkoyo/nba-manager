@@ -50,9 +50,9 @@ export default function TeamDataView() {
             setDeletingId(id);
             await deleter(`/api/teams/${id}`);
             dataMutate();
-            mutate(`/api/teams/${id}`, true);
-            mutate('/api/rosters', true);
-            mutate('/api/available', true);
+            mutate(`/api/teams/${id}`);
+            mutate('/api/rosters');
+            mutate('/api/available');
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);

@@ -44,9 +44,9 @@ export default function PlayerDataView() {
             setDeletingId(id);
             await deleter(`/api/players/${id}`);
             dataMutate();
-            mutate(`/api/player/${id}`, true);
-            mutate('/api/rosters', true);
-            mutate('/api/available', true);
+            mutate(`/api/player/${id}`);
+            mutate('/api/rosters');
+            mutate('/api/available');
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);
@@ -131,7 +131,7 @@ export default function PlayerDataView() {
                     </TableTr>
                 </TableThead>
                 <TableTbody>
-                    {data.map((player) => (
+                    {data?.map((player) => (
                         <TableTr key={player.playerID}>
                             <TableTd>{player.playerID}</TableTd>
                             {showFirstName && (

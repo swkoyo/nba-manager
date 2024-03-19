@@ -2,7 +2,7 @@
 
 import { Alert, Center, Loader } from '@mantine/core';
 import RosterForm from '../../rosterForm';
-import { useAvailable, useRoster } from '@/app/swr';
+import { useRoster } from '@/app/swr';
 
 export default function EditRosterPage({ params }: { params: { id: number } }) {
     const {
@@ -10,24 +10,19 @@ export default function EditRosterPage({ params }: { params: { id: number } }) {
         isLoading: rosterIsLoading,
         error: rosterError,
     } = useRoster(params.id);
-    const {
-        data: available,
-        isLoading: availableIsLoading,
-        error: availableError,
-    } = useAvailable();
 
-    if (rosterError || availableError) {
+    if (rosterError) {
         return (
             <Center>
                 <Alert color='red' title='Error'>
                     An error occured while retrieving data:{' '}
-                    {rosterError ? rosterError.message : availableError.message}
+                    {rosterError.message}
                 </Alert>
             </Center>
         );
     }
 
-    if (rosterIsLoading || availableIsLoading || !roster || !available) {
+    if (rosterIsLoading || !roster) {
         return (
             <Center>
                 <Loader />
@@ -35,12 +30,5 @@ export default function EditRosterPage({ params }: { params: { id: number } }) {
         );
     }
 
-    return (
-        <RosterForm
-            roster={roster}
-            teams={available.teams}
-            players={available.players}
-            playoffRounds={available.playoffRounds}
-        />
-    );
+    return <RosterForm roster={roster} />;
 }

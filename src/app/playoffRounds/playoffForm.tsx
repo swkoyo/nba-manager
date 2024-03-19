@@ -52,11 +52,11 @@ export default function PlayoffForm({
                 await post(data);
             } else {
                 await put(data);
-                mutate('/api/rosters', true);
-                mutate(`/api/playoffRounds/${playoffRound.playoffRoundID}`, true);
+                mutate('/api/rosters');
+                mutate(`/api/playoffRounds/${playoffRound.playoffRoundID}`);
             }
-            mutate('/api/playoffRounds', true);
-            mutate('/api/available', true);
+            mutate('/api/playoffRounds');
+            mutate('/api/available');
             setIsLoading(false);
             redirect('/playoffRounds');
         } catch (err) {

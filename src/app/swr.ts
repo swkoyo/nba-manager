@@ -265,7 +265,8 @@ export function usePlayoffRound(id: number) {
 export function useAvailable() {
     const { data, error, isLoading, mutate } = useSWR<AvailableData>(
         '/api/available',
-        fetcher
+        fetcher,
+        { revalidateOnMount: true }
     );
 
     return {

@@ -54,11 +54,11 @@ export default function PlayerForm({ player }: Props) {
                 await post(data);
             } else {
                 await put(data);
-                mutate('/api/rosters', true);
-                mutate(`/api/players/${player.playerID}`, true);
+                mutate('/api/rosters');
+                mutate(`/api/players/${player.playerID}`);
             }
-            mutate('/api/players', true);
-            mutate('/api/available', true);
+            mutate('/api/players');
+            mutate('/api/available');
             setIsLoading(false);
             redirect('/players');
         } catch (err) {

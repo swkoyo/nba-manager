@@ -52,7 +52,7 @@ export default function RosterDataView() {
             setDeletingId(id);
             await deleter(`/api/rosters/${id}`);
             dataMutate();
-            mutate(`/api/rosters/${id}`, true);
+            mutate(`/api/rosters/${id}`);
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);

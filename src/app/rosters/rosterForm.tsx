@@ -1,8 +1,17 @@
 'use client';
 
 import { YEARS } from '@/lib/constants';
-import { FullRoster, Player, PlayoffRound, Team } from '@/lib/types';
-import { Alert, Box, Button, Group, MultiSelect, Select } from '@mantine/core';
+import { FullRoster } from '@/lib/types';
+import {
+    Alert,
+    Box,
+    Button,
+    Center,
+    Group,
+    Loader,
+    MultiSelect,
+    Select,
+} from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 import { redirect } from '../actions';
@@ -10,23 +19,22 @@ import Link from 'next/link';
 import { useSWRConfig } from 'swr';
 import { useState } from 'react';
 import { poster, putter } from '../fetcher';
+import { useAvailable } from '../swr';
 
 interface Props {
     roster?: FullRoster;
-    players: Player[];
-    teams: Team[];
-    playoffRounds: PlayoffRound[];
 }
 
-export default function RosterForm({
-    roster,
-    players,
-    teams,
-    playoffRounds,
-}: Props) {
+export default function RosterForm({ roster }: Props) {
     const { mutate } = useSWRConfig();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const {
+        data: availableData,
+        isLoading: availableIsLoading,
+        error: availableError,
+    } = useAvailable();
+
     const schema = z.object({
         year: z
             .string()
@@ -34,46 +42,12 @@ export default function RosterForm({
             .refine((data) => YEARS.includes(data), {
                 message: 'Invalid year',
             }),
-        team: z
-            .string()
-            .refine(
-                (data) => teams.some((team) => team.teamID === parseInt(data)),
-                {
-                    message: 'Invalid team',
-                }
-            ),
-        playoffRound: z
-            .string()
-            .refine(
-                (data) =>
-                    data === '' ||
-                    playoffRounds.some(
-                        (round) => round.playoffRoundID === parseInt(data)
-                    ),
-                {
-                    message: 'Invalid Playoff Round',
-                }
-            ),
+        team: z.string(),
+        playoffRound: z.string(),
         players: z
             .string()
             .array()
-            .max(5, { message: 'Five players allowed at maximum' })
-            .refine(
-                (data) => {
-                    if (data.length === 0) return true;
-                    for (const p of data) {
-                        if (
-                            players.some(
-                                (player) => player.playerID !== parseInt(p)
-                            )
-                        ) {
-                            return true;
-                        }
-                    }
-                    return false;
-                },
-                { message: 'Invalid player given' }
-            ),
+            .max(5, { message: 'Five players allowed at maximum' }),
     });
 
     type Schema = z.infer<typeof schema>;
@@ -117,9 +91,9 @@ export default function RosterForm({
                 await post(data);
             } else {
                 await put(data);
-                mutate(`/api/rosters/${roster.rosterID}`, true);
+                mutate(`/api/rosters/${roster.rosterID}`);
             }
-            mutate('/api/rosters', true);
+            mutate('/api/rosters');
             setIsLoading(false);
             redirect('/rosters');
         } catch (err) {
@@ -128,20 +102,39 @@ export default function RosterForm({
         }
     }
 
-    const teamOption = teams.map((team) => ({
+    if (availableError) {
+        return (
+            <Center>
+                <Alert color='red' title='Error'>
+                    An error occured while retrieving data:{' '}
+                    {availableError.message}
+                </Alert>
+            </Center>
+        );
+    }
+
+    if (availableIsLoading || !availableData) {
+        return (
+            <Center>
+                <Loader />
+            </Center>
+        );
+    }
+
+    const teamOption = availableData.teams.map((team) => ({
         value: team.teamID.toString(),
         label: `${team.city} ${team.name}`,
     }));
 
     const playoffRoundOption = [
         { value: '', label: '-' },
-        ...playoffRounds.map((round) => ({
+        ...availableData.playoffRounds.map((round) => ({
             value: round.playoffRoundID.toString(),
             label: round.name,
         })),
     ];
 
-    const playerOption = players.map((player) => ({
+    const playerOption = availableData.players.map((player) => ({
         value: player.playerID.toString(),
         label: `${player.firstName} ${player.lastName}`,
     }));
