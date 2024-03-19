@@ -65,7 +65,7 @@ export default function TeamForm({ team }: Props) {
                 mutate(`/api/teams/${team.teamID}`);
             }
             mutate('/api/teams');
-            mutate('/api/available');
+            // mutate('/api/available');
             setIsLoading(false);
             redirect('/teams');
         } catch (err) {

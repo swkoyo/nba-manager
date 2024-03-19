@@ -19,7 +19,7 @@ import Link from 'next/link';
 import { useSWRConfig } from 'swr';
 import { useState } from 'react';
 import { poster, putter } from '../fetcher';
-import { useAvailable } from '../swr';
+import { useAllPlayers, useAllPlayoffRounds, useAllTeams } from '../swr';
 
 interface Props {
     roster?: FullRoster;
@@ -30,10 +30,29 @@ export default function RosterForm({ roster }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const {
-        data: availableData,
-        isLoading: availableIsLoading,
-        error: availableError,
-    } = useAvailable();
+        data: playerData,
+        isLoading: playerIsLoading,
+        error: playerError,
+    } = useAllPlayers({
+        showFirstName: true,
+        showLastName: true,
+        searchVal: '',
+    });
+    const {
+        data: playoffData,
+        isLoading: playoffIsLoading,
+        error: playoffError,
+    } = useAllPlayoffRounds({ showName: true, searchVal: '' });
+    const {
+        data: teamData,
+        isLoading: teamIsLoading,
+        error: teamError,
+    } = useAllTeams({
+        showCity: true,
+        showName: true,
+        showState: true,
+        searchVal: '',
+    });
 
     const schema = z.object({
         year: z
@@ -102,42 +121,30 @@ export default function RosterForm({ roster }: Props) {
         }
     }
 
-    if (availableError) {
+    if (playerError || playoffError || teamError) {
         return (
             <Center>
                 <Alert color='red' title='Error'>
-                    An error occured while retrieving data:{' '}
-                    {availableError.message}
+                    An error occured while retrieving data.
                 </Alert>
             </Center>
         );
     }
 
-    if (availableIsLoading || !availableData) {
+    if (
+        playerIsLoading ||
+        playoffIsLoading ||
+        teamIsLoading ||
+        !playerData ||
+        !playoffData ||
+        !teamData
+    ) {
         return (
             <Center>
                 <Loader />
             </Center>
         );
     }
-
-    const teamOption = availableData.teams.map((team) => ({
-        value: team.teamID.toString(),
-        label: `${team.city} ${team.name}`,
-    }));
-
-    const playoffRoundOption = [
-        { value: '', label: '-' },
-        ...availableData.playoffRounds.map((round) => ({
-            value: round.playoffRoundID.toString(),
-            label: round.name,
-        })),
-    ];
-
-    const playerOption = availableData.players.map((player) => ({
-        value: player.playerID.toString(),
-        label: `${player.firstName} ${player.lastName}`,
-    }));
 
     return (
         <Box mx='auto'>
@@ -167,14 +174,23 @@ export default function RosterForm({ roster }: Props) {
                     withAsterisk
                     label='Team'
                     placeholder='Harlem Globetrotters'
-                    data={teamOption}
+                    data={teamData.map((team) => ({
+                        value: team.teamID.toString(),
+                        label: `${team.city} ${team.name}`,
+                    }))}
                     searchable
                     {...form.getInputProps('team')}
                 />
                 <Select
                     label='Playoff Round'
                     placeholder='None'
-                    data={playoffRoundOption}
+                    data={[
+                        { value: '', label: '-' },
+                        ...playoffData.map((round) => ({
+                            value: round.playoffRoundID.toString(),
+                            label: round.name,
+                        })),
+                    ]}
                     searchable
                     {...form.getInputProps('playoffRound')}
                 />
@@ -182,7 +198,10 @@ export default function RosterForm({ roster }: Props) {
                     label='Players'
                     withAsterisk
                     placeholder='Pick up to 5 players'
-                    data={playerOption}
+                    data={playerData.map((player) => ({
+                        value: player.playerID.toString(),
+                        label: `${player.firstName} ${player.lastName}`,
+                    }))}
                     maxValues={5}
                     searchable
                     {...form.getInputProps('players')}

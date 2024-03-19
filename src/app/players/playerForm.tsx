@@ -58,7 +58,6 @@ export default function PlayerForm({ player }: Props) {
                 mutate(`/api/players/${player.playerID}`);
             }
             mutate('/api/players');
-            mutate('/api/available');
             setIsLoading(false);
             redirect('/players');
         } catch (err) {

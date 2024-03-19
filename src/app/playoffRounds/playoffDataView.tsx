@@ -45,7 +45,6 @@ export default function PlayoffDataView() {
             dataMutate();
             mutate(`/api/playoffRounds/${id}`);
             mutate('/api/rosters');
-            mutate('/api/available');
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);

@@ -46,7 +46,6 @@ export default function PlayerDataView() {
             dataMutate();
             mutate(`/api/player/${id}`);
             mutate('/api/rosters');
-            mutate('/api/available');
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);

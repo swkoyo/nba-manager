@@ -49,12 +49,6 @@ export function useAllTeams({
                 throw new Error(message);
             }
             return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
         }
     );
 
@@ -117,31 +111,22 @@ export function useAllPlayoffRounds({
         PlayoffRound[],
         any,
         string
-    >(
-        '/api/playoffRounds',
-        async (url) => {
-            const params: string[] = [];
-            if (showName) {
-                params.push('name');
-            }
-            url += `?filter=${params.join(',')}`;
-            if (searchVal) {
-                url += `&search=${searchVal}`;
-            }
-            const res = await fetch(url);
-            if (!res.ok) {
-                const { message } = await res.json();
-                throw new Error(message);
-            }
-            return res.json();
-        },
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-            revalidateOnMount: false,
+    >('/api/playoffRounds', async (url) => {
+        const params: string[] = [];
+        if (showName) {
+            params.push('name');
         }
-    );
+        url += `?filter=${params.join(',')}`;
+        if (searchVal) {
+            url += `&search=${searchVal}`;
+        }
+        const res = await fetch(url);
+        if (!res.ok) {
+            const { message } = await res.json();
+            throw new Error(message);
+        }
+        return res.json();
+    });
 
     return { data, isLoading, error, mutate };
 }

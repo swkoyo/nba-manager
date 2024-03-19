@@ -56,7 +56,6 @@ export default function PlayoffForm({
                 mutate(`/api/playoffRounds/${playoffRound.playoffRoundID}`);
             }
             mutate('/api/playoffRounds');
-            mutate('/api/available');
             setIsLoading(false);
             redirect('/playoffRounds');
         } catch (err) {

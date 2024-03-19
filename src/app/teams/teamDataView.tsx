@@ -52,7 +52,7 @@ export default function TeamDataView() {
             dataMutate();
             mutate(`/api/teams/${id}`);
             mutate('/api/rosters');
-            mutate('/api/available');
+            // mutate('/api/available');
             setDeletingId(null);
         } catch (err) {
             setDeletingId(null);
